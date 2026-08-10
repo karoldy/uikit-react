@@ -1,0 +1,20 @@
+{
+  "plugins": ["eslint", "react", "typescript", "import", "unicorn"],
+  "settings": {
+    "react": {
+      "version": "19.0.0"
+    }
+  },
+  "rules": {
+    "eqeqeq": "error",
+    "no-eval": "error",
+    "no-unused-expressions": "error",
+    "no-unneeded-ternary": "warn",
+    "object-shorthand": "warn",
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    "react/jsx-no-target-blank": "error",
+    "react/no-direct-mutation-state": "error",
+    "react/jsx-curly-brace-presence": "warn"
+  }
+}

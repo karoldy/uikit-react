@@ -1,0 +1,8 @@
+node_modules/
+dist/
+pnpm-lock.yaml
+.turbo/
+*.tsbuildinfo
+.pnpm-store/
+docs/
+.superpowers

@@ -1,0 +1,12 @@
+{
+  "name": "@uikit-react/ui-storybook",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node -e \"console.log('dev placeholder: @uikit-react/ui-storybook')\"",
+    "lint": "oxlint src/",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "node -e \"console.log('build placeholder: @uikit-react/ui-storybook')\""
+  }
+}

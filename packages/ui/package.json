@@ -1,0 +1,17 @@
+{
+  "name": "@uikit-react/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint src/",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "node -e \"console.log('build placeholder: @uikit-react/ui')\""
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}

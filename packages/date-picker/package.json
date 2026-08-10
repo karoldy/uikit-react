@@ -1,0 +1,17 @@
+{
+  "name": "@uikit-react/date-picker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint src/",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "node -e \"console.log('build placeholder: @uikit-react/date-picker')\""
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  }
+}
