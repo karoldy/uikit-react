@@ -1,5 +1,5 @@
 {
-  "name": "@uikit-react/date-picker",
+  "name": "@uikit-react/calendar-base",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -14,10 +14,6 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
-  },
-  "dependencies": {
-    "@uikit-react/calendar-base": "workspace:*",
-    "@uikit-react/popover": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.0",
