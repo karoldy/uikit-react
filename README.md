@@ -9,6 +9,7 @@ uikit-react/
 ├── packages/
 │   ├── ui/            # 核心 UI 组件
 │   ├── hooks/         # 通用 React Hooks
+│   ├── popover/       # Popover 浮层
 │   ├── data-table/    # 数据表格组件
 │   └── date-picker/   # 日期选择器组件
 ├── apps/
@@ -23,6 +24,7 @@ uikit-react/
 | ------------- | --------------------- |
 | `ui`          | 核心 UI 组件库        |
 | `hooks`       | 通用 React Hooks 集合 |
+| `popover`     | Popover 浮层组件      |
 | `data-table`  | 数据表格组件          |
 | `date-picker` | 日期选择器组件        |
 
@@ -51,11 +53,10 @@ pnpm install
 pnpm lint
 pnpm typecheck
 
-# 占位 build（真实打包下一轮）
-pnpm build
+# Storybook（Popover 等组件演示）
+pnpm --filter @uikit-react/ui-storybook dev
+# → http://localhost:6006
 ```
-
-Storybook / 文档站命令将在接入对应 app 框架后启用。
 
 ## 许可证
 
