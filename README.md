@@ -7,7 +7,6 @@
 ```
 uikit-react/
 ├── packages/
-│   ├── ui/            # 核心 UI 组件
 │   ├── hooks/         # 通用 React Hooks
 │   ├── popover/       # Popover 浮层
 │   ├── calendar-base/ # 无样式日历网格与日期工具
@@ -23,7 +22,6 @@ uikit-react/
 
 | 包名            | 描述                             |
 | --------------- | -------------------------------- |
-| `ui`            | 核心 UI 组件库                   |
 | `hooks`         | 通用 React Hooks 集合            |
 | `popover`       | Popover 浮层组件                 |
 | `calendar-base` | 无样式日历网格与日期工具         |

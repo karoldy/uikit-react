@@ -28,19 +28,16 @@ If either fails, stop and report the errors.
 Ask the user for:
 
 - **type**: `feat` | `fix` | `docs` | `style` | `refactor` | `perf` | `test` | `chore` | `revert` | `build` | `ci`
-- **scope**: `ui` | `hooks` | `utils` | `date-picker` | `data-table` | `feedback-modal` | `storybook` | `docs` | `root`
+- **scope**: `hooks` | `popover` | `calendar-base` | `date-picker` | `data-table` | `storybook` | `docs` | `root`
 - **subject**: short description (lowercase, no period at end)
 
 Auto-detect scope based on changed files:
 
-- `packages/ui/**` → `ui`
 - `packages/hooks/**` → `hooks`
-- `packages/utils/**` → `utils`
+- `packages/popover/**` → `popover`
 - `packages/calendar-base/**` → `calendar-base`
-- `packages/rect-date-picker/**` → `rect-date-picker`
-- `packages/round-date-picker/**` → `round-date-picker`
+- `packages/date-picker/**` → `date-picker`
 - `packages/data-table/**` → `data-table`
-- `packages/feedback-modal/**` → `feedback-modal`
 - `apps/ui-storybook/**` → `storybook`
 - `apps/ui-docs/**` → `docs`
 - Multiple packages changed or root config files → `root`
