@@ -1,0 +1,272 @@
+.uikit-cal {
+  --uikit-cal-cell: 2.25rem;
+  --uikit-cal-gap: 2px;
+  --uikit-cal-accent: #1976d2;
+  --uikit-cal-fg: #1a1a1a;
+  --uikit-cal-muted: rgba(0, 0, 0, 0.35);
+
+  display: inline-block;
+  color: var(--uikit-cal-fg);
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    sans-serif;
+  font-size: 0.875rem;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__panels {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  &__panel {
+    display: inline-block;
+    min-width: calc(var(--uikit-cal-cell) * 7);
+  }
+
+  &__heading {
+    margin: 0;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    color: inherit;
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  @at-root h2#{&}__heading {
+    cursor: default;
+  }
+
+  &__nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(25, 118, 210, 0.08);
+    }
+  }
+
+  &__grid,
+  &__days,
+  &__year-select,
+  &__month-grid {
+    overflow: hidden;
+  }
+
+  &__days--up {
+    animation: uikit-cal-up 0.5s ease;
+  }
+
+  &__days--down {
+    animation: uikit-cal-down 0.5s ease;
+  }
+
+  &__grid--up {
+    animation: uikit-cal-up 0.5s ease;
+  }
+
+  &__grid--down {
+    animation: uikit-cal-down 0.5s ease;
+  }
+
+  &__grid--enlarge {
+    animation: uikit-cal-enlarge 0.5s ease;
+  }
+
+  &__grid--reduce {
+    animation: uikit-cal-reduce 0.5s ease;
+  }
+
+  &__weekdays,
+  &__days {
+    display: grid;
+    grid-template-columns: repeat(7, var(--uikit-cal-cell));
+    gap: var(--uikit-cal-gap);
+  }
+
+  &__weekday {
+    text-align: center;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    line-height: var(--uikit-cal-cell);
+  }
+
+  &__day {
+    width: var(--uikit-cal-cell);
+    height: var(--uikit-cal-cell);
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+
+    &:hover:not(:disabled):not(.uikit-cal__day--selected):not(.uikit-cal__day--range-start):not(
+        .uikit-cal__day--range-end
+      ):not(.uikit-cal__day--in-range) {
+      background: rgba(25, 118, 210, 0.08);
+    }
+
+    &--selected {
+      background: var(--uikit-cal-accent);
+      color: #fff;
+    }
+
+    &--in-range {
+      background: rgba(25, 118, 210, 0.12);
+      border-radius: 0;
+    }
+
+    &--preview.uikit-cal__day--in-range {
+      background: rgba(25, 118, 210, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(25, 118, 210, 0.35);
+    }
+
+    &--range-start,
+    &--range-end {
+      background: var(--uikit-cal-accent);
+      color: #fff;
+    }
+
+    &--preview.uikit-cal__day--range-start,
+    &--preview.uikit-cal__day--range-end {
+      background: color-mix(in srgb, var(--uikit-cal-accent) 85%, #fff);
+    }
+
+    &--range-start:not(.uikit-cal__day--in-range) {
+      border-radius: 4px;
+    }
+
+    &--range-start.uikit-cal__day--in-range {
+      border-radius: 4px 0 0 4px;
+    }
+
+    &--range-end {
+      border-radius: 0 4px 4px 0;
+    }
+
+    &--range-start.uikit-cal__day--range-end {
+      border-radius: 4px;
+    }
+
+    &--today:not(.uikit-cal__day--selected):not(.uikit-cal__day--in-range) {
+      outline: 2px solid var(--uikit-cal-accent);
+    }
+
+    &--outside {
+      opacity: 0.35;
+    }
+
+    &--empty {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    &--disabled,
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
+  &__year-select,
+  &__month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+    min-width: calc(var(--uikit-cal-cell) * 7);
+  }
+
+  &__year,
+  &__month {
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    padding: 0.65rem 0.5rem;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+
+    &:hover:not(.uikit-cal__year--selected):not(.uikit-cal__month--selected) {
+      background: rgba(25, 118, 210, 0.08);
+    }
+
+    &--selected {
+      background: var(--uikit-cal-accent);
+      color: #fff;
+    }
+  }
+}
+
+@keyframes uikit-cal-up {
+  0% {
+    transform: translateY(100%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes uikit-cal-down {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes uikit-cal-enlarge {
+  0% {
+    transform: scale(0.5);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes uikit-cal-reduce {
+  0% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uikit-cal__days--up,
+  .uikit-cal__days--down,
+  .uikit-cal__grid--up,
+  .uikit-cal__grid--down,
+  .uikit-cal__grid--enlarge,
+  .uikit-cal__grid--reduce {
+    animation: none;
+  }
+}
