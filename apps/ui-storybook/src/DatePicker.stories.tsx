@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Button, Stack, Typography } from '@mui/material';
 import { DatePicker } from '@uikit-react/date-picker';
+import '@uikit-react/calendar-base/styles.css';
 
 const meta = {
   title: 'DatePicker',

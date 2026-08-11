@@ -80,7 +80,7 @@ export function toMonthString(value: DateString): MonthString {
   return `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}`;
 }
 
-function parseMonthString(month: MonthString): { y: number; m: number } {
+export function parseMonthString(month: MonthString): { y: number; m: number } {
   const match = MONTH_STRING_RE.exec(month);
   if (!match) {
     throw new Error(`Invalid month string: ${month}`);
@@ -93,6 +93,22 @@ function parseMonthString(month: MonthString): { y: number; m: number } {
   }
 
   return { y, m };
+}
+
+export function getYear(month: MonthString): number {
+  return parseMonthString(month).y;
+}
+
+export function monthStringFromParts(y: number, m: number): MonthString {
+  if (m < 1 || m > 12) {
+    throw new Error(`Invalid month: ${m}`);
+  }
+  return `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}`;
+}
+
+export function addYears(month: MonthString, delta: number): MonthString {
+  const { y, m } = parseMonthString(month);
+  return monthStringFromParts(y + delta, m);
 }
 
 export function addMonths(month: MonthString, delta: number): MonthString {

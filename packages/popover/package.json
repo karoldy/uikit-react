@@ -1,10 +1,25 @@
 {
   "name": "@uikit-react/popover",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --target es2022",
@@ -30,5 +45,8 @@
     "tsup": "^8.5.0",
     "typescript": "^5.7.0",
     "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": ">=16"
   }
 }

@@ -2,8 +2,9 @@ import { createContext, useContext } from 'react';
 import type { CalendarSlotProps, CalendarSlots, UseCalendarReturn } from '../types';
 
 export interface CalendarContextValue extends UseCalendarReturn {
-  slots?: CalendarSlots<React.ElementType>;
-  slotProps?: CalendarSlotProps<React.ElementType>;
+  slots?: CalendarSlots;
+  slotProps?: CalendarSlotProps;
+  disableDefaultStyles: boolean;
 }
 
 export const CalendarContext = createContext<CalendarContextValue | null>(null);

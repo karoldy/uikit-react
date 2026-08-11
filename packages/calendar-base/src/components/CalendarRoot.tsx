@@ -1,25 +1,36 @@
-import type { ElementType } from 'react';
 import { useCalendar } from '../hooks/use-calendar';
 import type { CalendarRootProps } from '../types';
+import { cx } from '../utils/cx';
 import { CalendarContext } from './calendar-context';
+import { renderSlot } from './render-slot';
 
-export function CalendarRoot<TDay extends ElementType = 'button'>({
+export function CalendarRoot({
   value,
   defaultValue,
   onChange,
   month,
   defaultMonth,
   onMonthChange,
+  view,
+  defaultView,
+  onViewChange,
+  views,
   min,
   max,
   isDateDisabled,
   weekStartsOn,
   locale,
+  weekdayFormat,
+  animated,
+  animationClassNames,
+  animationDuration,
   slots,
   slotProps,
+  disableDefaultStyles = false,
+  className,
   children,
   ...props
-}: CalendarRootProps<TDay>) {
+}: CalendarRootProps) {
   const calendar = useCalendar({
     value,
     defaultValue,
@@ -27,22 +38,47 @@ export function CalendarRoot<TDay extends ElementType = 'button'>({
     month,
     defaultMonth,
     onMonthChange,
+    view,
+    defaultView,
+    onViewChange,
+    views,
     min,
     max,
     isDateDisabled,
     weekStartsOn,
     locale,
+    weekdayFormat,
+    animated,
+    animationClassNames,
+    animationDuration,
   });
+
+  const rootSlotProps = (slotProps?.root ?? {}) as Record<string, unknown>;
+  const mergedClassName = cx(
+    !disableDefaultStyles && 'uikit-cal',
+    rootSlotProps.className as string | undefined,
+    className,
+  );
 
   return (
     <CalendarContext.Provider
       value={{
         ...calendar,
-        slots: slots as CalendarRootProps<ElementType>['slots'],
-        slotProps: slotProps as CalendarRootProps<ElementType>['slotProps'],
+        slots,
+        slotProps,
+        disableDefaultStyles,
       }}
     >
-      <div {...props}>{children}</div>
+      {renderSlot(
+        slots?.root,
+        'div',
+        {
+          ...props,
+          ...rootSlotProps,
+          className: mergedClassName,
+        },
+        children,
+      )}
     </CalendarContext.Provider>
   );
 }

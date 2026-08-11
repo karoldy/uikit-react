@@ -58,7 +58,7 @@ export interface DatePickerProps
   asChild?: boolean;
   children?: React.ReactNode;
   placeholder?: React.ReactNode;
-  calendarSlots?: CalendarSlots<React.ElementType>;
-  calendarSlotProps?: CalendarSlotProps<React.ElementType>;
+  calendarSlots?: CalendarSlots;
+  calendarSlotProps?: CalendarSlotProps;
   slotProps?: DatePickerSlotProps;
 }

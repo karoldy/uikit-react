@@ -1,5 +1,7 @@
 import type { CalendarWeekDaysProps } from '../types';
+import { cx } from '../utils/cx';
 import { useCalendarContext } from './calendar-context';
+import { renderSlot } from './render-slot';
 
 function getWeekDays(formatter: Intl.DateTimeFormat, weekStartsOn: number): string[] {
   const sunday = new Date(2026, 7, 2);
@@ -8,16 +10,33 @@ function getWeekDays(formatter: Intl.DateTimeFormat, weekStartsOn: number): stri
   );
 }
 
-export function CalendarWeekDays({ children, ...props }: CalendarWeekDaysProps) {
-  const { weekdayFormatter, weekStartsOn } = useCalendarContext();
-  return (
-    <div role="row" {...props}>
-      {children ??
-        getWeekDays(weekdayFormatter, weekStartsOn).map((label, index) => (
-          <div role="columnheader" key={index}>
-            {label}
-          </div>
-        ))}
-    </div>
+export function CalendarWeekDays({ className, children, ...props }: CalendarWeekDaysProps) {
+  const { weekdayFormatter, weekStartsOn, slots, slotProps, disableDefaultStyles } =
+    useCalendarContext();
+  const configured = (slotProps?.weekDays ?? {}) as Record<string, unknown>;
+
+  return renderSlot(
+    slots?.weekDays,
+    'div',
+    {
+      role: 'row',
+      ...props,
+      ...configured,
+      className: cx(
+        !disableDefaultStyles && 'uikit-cal__weekdays',
+        configured.className as string | undefined,
+        className,
+      ),
+    },
+    children ??
+      getWeekDays(weekdayFormatter, weekStartsOn).map((label, index) => (
+        <div
+          role="columnheader"
+          key={index}
+          className={disableDefaultStyles ? undefined : 'uikit-cal__weekday'}
+        >
+          {label}
+        </div>
+      )),
   );
 }
