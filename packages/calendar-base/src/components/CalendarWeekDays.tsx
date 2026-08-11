@@ -19,7 +19,6 @@ export function CalendarWeekDays({ className, children, ...props }: CalendarWeek
     slots?.weekDays,
     'div',
     {
-      role: 'row',
       ...props,
       ...configured,
       className: cx(
@@ -30,11 +29,7 @@ export function CalendarWeekDays({ className, children, ...props }: CalendarWeek
     },
     children ??
       getWeekDays(weekdayFormatter, weekStartsOn).map((label, index) => (
-        <div
-          role="columnheader"
-          key={index}
-          className={disableDefaultStyles ? undefined : 'uikit-cal__weekday'}
-        >
+        <div key={index} className={disableDefaultStyles ? undefined : 'uikit-cal__weekday'}>
           {label}
         </div>
       )),

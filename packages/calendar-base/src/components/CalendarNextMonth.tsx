@@ -16,29 +16,29 @@ export function CalendarNextMonth({
   const configured = (slotProps?.nextMonth ?? {}) as Record<string, unknown>;
   const configuredOnClick = configured.onClick as
     ((event: MouseEvent<HTMLElement>) => void) | undefined;
-  const ariaLabel = view === 'year' ? 'Next years' : view === 'month' ? 'Next year' : 'Next month';
+  const label = view === 'year' ? 'Next years' : view === 'month' ? 'Next year' : 'Next month';
+  const NextSlot = slots?.nextMonth;
+  const mergedProps: Record<string, unknown> = {
+    type: 'button',
+    ...props,
+    ...configured,
+    className: cx(
+      !disableDefaultStyles && 'uikit-cal__nav',
+      configured.className as string | undefined,
+      className,
+    ),
+    onClick: composeClickHandlers(
+      configuredOnClick,
+      composeClickHandlers(onClick as ((event: MouseEvent<HTMLElement>) => void) | undefined, () =>
+        goToNext(),
+      ),
+    ),
+  };
 
-  return renderSlot(
-    slots?.nextMonth,
-    'button',
-    {
-      type: 'button',
-      'aria-label': ariaLabel,
-      ...props,
-      ...configured,
-      className: cx(
-        !disableDefaultStyles && 'uikit-cal__nav',
-        configured.className as string | undefined,
-        className,
-      ),
-      onClick: composeClickHandlers(
-        configuredOnClick,
-        composeClickHandlers(
-          onClick as ((event: MouseEvent<HTMLElement>) => void) | undefined,
-          () => goToNext(),
-        ),
-      ),
-    },
-    children ?? <ChevronRightIcon />,
-  );
+  if (NextSlot && typeof NextSlot !== 'string') {
+    mergedProps.label = label;
+    mergedProps.view = view;
+  }
+
+  return renderSlot(NextSlot, 'button', mergedProps, children ?? <ChevronRightIcon />);
 }

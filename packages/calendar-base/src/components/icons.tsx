@@ -7,7 +7,6 @@ export function ChevronLeftIcon({ className }: { className?: string }) {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
       focusable="false"
     >
       <path
@@ -30,7 +29,6 @@ export function ChevronRightIcon({ className }: { className?: string }) {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
       focusable="false"
     >
       <path

@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { buildCalendarMatrix } from '../utils/calendar-matrix';
 import {
+  calendarValueToDateString,
+  isCalendarDateRange,
+  isDateInRange,
+  isRangeEnd as isRangeEndOf,
+  isRangeStart as isRangeStartOf,
+  normalizeDateRange,
+  resolveHighlightedRange,
+} from '../utils/date-range';
+import {
   addMonths,
   addYears,
   getTodayString,
@@ -12,6 +21,7 @@ import {
   type DateString,
   type MonthString,
 } from '../utils/date-string';
+import { buildVisibleMonths } from '../utils/months';
 import {
   finerView,
   isFinerView,
@@ -20,17 +30,29 @@ import {
   coarserView,
 } from '../utils/views';
 import type {
+  CalendarDateRange,
+  CalendarDayOfResult,
+  CalendarValue,
   CalendarView,
   MonthSlideDirection,
   UseCalendarOptions,
   UseCalendarReturn,
   ViewTransition,
 } from '../types';
+import { getCalendarDayOfInfo } from '../utils/day-of';
 
 const YEAR_PAGE_SIZE = 12;
 
+function toRangeValue(value: CalendarValue): CalendarDateRange | null {
+  if (isCalendarDateRange(value)) {
+    return value;
+  }
+  return null;
+}
+
 export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn {
   const {
+    selectionMode = 'single',
     value: controlledValue,
     defaultValue = null,
     onChange,
@@ -44,18 +66,24 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
     min,
     max,
     isDateDisabled,
+    dayOf,
     weekStartsOn = 1,
     locale = 'en-US',
     weekdayFormat = 'short',
     animated = true,
     animationClassNames,
     animationDuration = 500,
+    numberOfMonths: numberOfMonthsOption = 1,
+    showOutsideDays = true,
   } = options;
 
+  const numberOfMonths = Math.max(1, Math.floor(numberOfMonthsOption) || 1);
+
   const views = useMemo(() => normalizeViews(viewsOption), [viewsOption]);
-  const [uncontrolledValue, setUncontrolledValue] = useState<DateString | null>(defaultValue);
+  const [uncontrolledValue, setUncontrolledValue] = useState<CalendarValue>(defaultValue);
   const initialMonth =
-    defaultMonth ?? toMonthString(controlledValue ?? defaultValue ?? getTodayString());
+    defaultMonth ??
+    toMonthString(calendarValueToDateString(controlledValue ?? defaultValue) ?? getTodayString());
   const [uncontrolledMonth, setUncontrolledMonth] = useState<MonthString>(initialMonth);
   const [uncontrolledView, setUncontrolledView] = useState<CalendarView>(() =>
     resolveInitialView(views, defaultView),
@@ -66,6 +94,7 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
   });
   const [monthSlideDirection, setMonthSlideDirection] = useState<MonthSlideDirection>(null);
   const [viewTransition, setViewTransition] = useState<ViewTransition>(null);
+  const [hoveredDate, setHoveredDateState] = useState<DateString | null>(null);
 
   const value = controlledValue !== undefined ? controlledValue : uncontrolledValue;
   const month = controlledMonth ?? uncontrolledMonth;
@@ -75,6 +104,15 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
       : views.includes(uncontrolledView)
         ? uncontrolledView
         : resolveInitialView(views, defaultView);
+
+  const rangeValue = selectionMode === 'range' ? toRangeValue(value) : null;
+  const isSelectingEnd =
+    selectionMode === 'range' && rangeValue !== null && rangeValue.end === null;
+  const isPreviewing = isSelectingEnd && hoveredDate !== null;
+  const highlightedRange = useMemo(
+    () => (selectionMode === 'range' ? resolveHighlightedRange(rangeValue, hoveredDate) : null),
+    [hoveredDate, rangeValue, selectionMode],
+  );
 
   const prevMonthRef = useRef(month);
   const prevViewRef = useRef(view);
@@ -115,11 +153,11 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
   }, [monthSlideDirection, viewTransition, month, view, animationDuration]);
 
   const setValue = useCallback(
-    (date: DateString | null) => {
+    (next: CalendarValue) => {
       if (controlledValue === undefined) {
-        setUncontrolledValue(date);
+        setUncontrolledValue(next);
       }
-      onChange?.(date);
+      onChange?.(next);
     },
     [controlledValue, onChange],
   );
@@ -149,23 +187,88 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
     [controlledView, onViewChange, views],
   );
 
-  const isSelected = useCallback((date: DateString) => value === date, [value]);
-  const isDisabled = useCallback(
-    (date: DateString) =>
-      (min !== undefined && compareDateString(date, min) < 0) ||
-      (max !== undefined && compareDateString(date, max) > 0) ||
-      Boolean(isDateDisabled?.(date)),
-    [isDateDisabled, max, min],
-  );
   const today = getTodayString();
   const isToday = useCallback((date: DateString) => date === today, [today]);
+
+  const getDayOf = useCallback(
+    (date: DateString, inCurrentMonth = true): CalendarDayOfResult => {
+      if (!dayOf) {
+        return {};
+      }
+      return (
+        dayOf(
+          getCalendarDayOfInfo(date, {
+            inCurrentMonth,
+            today,
+          }),
+        ) ?? {}
+      );
+    },
+    [dayOf, today],
+  );
+
+  const isDisabled = useCallback(
+    (date: DateString, inCurrentMonth = true) =>
+      (min !== undefined && compareDateString(date, min) < 0) ||
+      (max !== undefined && compareDateString(date, max) > 0) ||
+      Boolean(isDateDisabled?.(date)) ||
+      Boolean(getDayOf(date, inCurrentMonth).disabled),
+    [getDayOf, isDateDisabled, max, min],
+  );
+
+  const isRangeStart = useCallback(
+    (date: DateString) => isRangeStartOf(highlightedRange, date),
+    [highlightedRange],
+  );
+  const isRangeEnd = useCallback(
+    (date: DateString) => isRangeEndOf(highlightedRange, date),
+    [highlightedRange],
+  );
+  const isInRange = useCallback(
+    (date: DateString) => isDateInRange(highlightedRange, date),
+    [highlightedRange],
+  );
+  const isSelected = useCallback(
+    (date: DateString) => {
+      if (selectionMode === 'range') {
+        return isRangeStart(date) || isRangeEnd(date);
+      }
+      return value === date;
+    },
+    [isRangeEnd, isRangeStart, selectionMode, value],
+  );
+
   const selectDate = useCallback(
     (date: DateString) => {
-      if (!isDisabled(date)) {
-        setValue(date);
+      if (isDisabled(date)) {
+        return;
       }
+
+      if (selectionMode === 'range') {
+        const current = toRangeValue(value);
+        if (!current || current.end !== null) {
+          setHoveredDateState(null);
+          setValue({ start: date, end: null });
+          return;
+        }
+        setHoveredDateState(null);
+        setValue(normalizeDateRange({ start: current.start, end: date }));
+        return;
+      }
+
+      setValue(date);
     },
-    [isDisabled, setValue],
+    [isDisabled, selectionMode, setValue, value],
+  );
+
+  const setHoveredDate = useCallback(
+    (date: DateString | null) => {
+      if (date !== null && !isSelectingEnd) {
+        return;
+      }
+      setHoveredDateState(date);
+    },
+    [isSelectingEnd],
   );
 
   const selectMonth = useCallback(
@@ -225,7 +328,16 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
     }
   }, [setView, view, views]);
 
-  const cells = useMemo(() => buildCalendarMatrix(month, weekStartsOn), [month, weekStartsOn]);
+  const months = useMemo(() => buildVisibleMonths(month, numberOfMonths), [month, numberOfMonths]);
+  const panels = useMemo(
+    () =>
+      months.map((panelMonth) => ({
+        month: panelMonth,
+        cells: buildCalendarMatrix(panelMonth, weekStartsOn),
+      })),
+    [months, weekStartsOn],
+  );
+  const cells = panels[0]?.cells ?? buildCalendarMatrix(month, weekStartsOn);
   const year = getYear(month);
 
   const monthFormatter = useMemo(
@@ -255,6 +367,7 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
   );
 
   return {
+    selectionMode,
     value,
     setValue,
     month,
@@ -264,6 +377,10 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
     views,
     year,
     yearRangeStart,
+    numberOfMonths,
+    showOutsideDays,
+    months,
+    panels,
     cells,
     weekStartsOn,
     locale,
@@ -273,10 +390,18 @@ export function useCalendar(options: UseCalendarOptions = {}): UseCalendarReturn
     dayFormatter,
     yearFormatter,
     monthOnlyFormatter,
+    highlightedRange,
+    isPreviewing,
+    hoveredDate,
     isSelected,
+    isRangeStart,
+    isRangeEnd,
+    isInRange,
     isDisabled,
     isToday,
+    getDayOf,
     selectDate,
+    setHoveredDate,
     selectMonth,
     selectYear,
     goToPrev,

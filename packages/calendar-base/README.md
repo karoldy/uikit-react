@@ -34,13 +34,42 @@ import '@uikit-react/calendar-base/styles.css';
 <Calendar defaultValue="2026-08-10" defaultMonth="2026-08" locale="zh-CN" />;
 ```
 
+## 选区模式
+
+```tsx
+{
+  /* 单日（默认） */
+}
+<Calendar value="2026-08-10" onChange={setDate} />;
+
+{
+  /* 区间：两次点击选 start → end；未完成时 end 为 null */
+}
+<Calendar selectionMode="range" value={range} onChange={setRange} />;
+```
+
+区间值：`{ start: 'YYYY-MM-DD'; end: 'YYYY-MM-DD' | null } | null`。  
+日格 class：`--range-start` / `--range-end` / `--in-range`；选第二日 hover 时额外加 `--preview`。
+
+## 多月面板
+
+```tsx
+<Calendar numberOfMonths={2} defaultMonth="2026-08" />
+<Calendar selectionMode="range" numberOfMonths={2} defaultMonth="2026-08" />
+```
+
+- `month` 为**第一个**可见月；右侧依次 +1
+- day 视图：每面板自带 heading，prev 在左侧、next 在右侧
+- year / month 视图仍为单面板
+- compounds：`Calendar.Panels` / `Calendar.Panel`；`Calendar.Days month="2026-09"`
+
 ## 受控 / 非受控
 
-| 状态     | 非受控         | 受控                      |
-| -------- | -------------- | ------------------------- |
-| 选中日期 | `defaultValue` | `value` + `onChange`      |
-| 当前月   | `defaultMonth` | `month` + `onMonthChange` |
-| 当前视图 | `defaultView`  | `view` + `onViewChange`   |
+| 状态            | 非受控         | 受控                      |
+| --------------- | -------------- | ------------------------- |
+| 选中日期 / 区间 | `defaultValue` | `value` + `onChange`      |
+| 当前月          | `defaultMonth` | `month` + `onMonthChange` |
+| 当前视图        | `defaultView`  | `view` + `onViewChange`   |
 
 ```tsx
 const [value, setValue] = useState<string | null>('2026-08-10');
@@ -78,6 +107,28 @@ const [month, setMonth] = useState('2026-08');
 
 超出 `min`/`max` 或 `isDateDisabled` 为 true 的日期：`disabled`，点击不触发 `onChange`。
 
+### `dayOf`（假期 / 周末加班等）
+
+按天返回外部规则，可同时控制 `disabled` 与额外 `className`：
+
+```tsx
+const holidays = new Set(['2026-10-01', '2026-10-02']);
+const overtimeWeekends = new Set(['2026-08-15']); // 加班的周末 → 可点
+
+<Calendar
+  dayOf={({ date, isWeekend }) => {
+    if (holidays.has(date)) {
+      return { disabled: true, className: 'is-holiday' };
+    }
+    if (isWeekend && !overtimeWeekends.has(date)) {
+      return { disabled: true, className: 'is-weekend' };
+    }
+  }}
+/>;
+```
+
+回调参数：`date`、`dayOfWeek`（0–6）、`isWeekend`、`isToday`、`inCurrentMonth`。与 `min` / `max` / `isDateDisabled` 取并集禁用。
+
 ## Locale 与星期
 
 ```tsx
@@ -87,6 +138,15 @@ const [month, setMonth] = useState('2026-08');
 - `locale`：标题、星期、年/月标签（`Intl.DateTimeFormat`）
 - `weekdayFormat`：`'narrow' | 'short' | 'long'`（默认 `short`）
 - `weekStartsOn`：`0`–`6`（默认 `1` = 周一）
+
+## 相邻月日期
+
+```tsx
+<Calendar showOutsideDays={false} />
+```
+
+- 默认 `true`：网格填满上/下月日期（`--outside`）
+- `false`：相邻月格子留空，仍保持 6×7 布局
 
 ## 样式
 
@@ -98,7 +158,7 @@ const [month, setMonth] = useState('2026-08');
 
 仍可自行 import CSS，或完全用 slots / 自写样式。
 
-**状态语义**：`aria-pressed` / `aria-current` / `disabled`，**无** `data-*` 状态属性。
+Calendar **不**注入 `aria-*` / `data-*` / `role`；无障碍由调用方在 slot 上自行决定。状态通过显式 props 与（可选）默认 CSS class 表达。
 
 ### CSS 变量
 
@@ -114,29 +174,51 @@ const [month, setMonth] = useState('2026-08');
 
 `uikit-cal` · `__header` · `__heading` · `__nav` · `__grid` · `__weekdays` · `__day` · `__day--selected` · `__day--today` · `__day--outside` · `__day--disabled` · `__year-select` · `__month-grid` · `__year` · `__month` · `__year--selected` · `__month--selected`
 
-动画：`__grid--up` / `--down` / `--enlarge` / `--reduce`（尊重 `prefers-reduced-motion`）。
+动画：day 翻月 `__days--up` / `--down`；切视图 `__grid--enlarge` / `--reduce`（年/月面板仍用 `__grid--up` / `--down`）。尊重 `prefers-reduced-motion`。
 
-## Slots（11）
+## Slots
 
-`root` · `header` · `prevMonth` · `nextMonth` · `heading` · `grid` · `weekDays` · `days` · `day` · `yearSelect` · `monthGrid`
+`root` · `header` · `prevMonth` · `nextMonth` · `heading` · `grid` · `weekDays` · `days` · `day` · `year` · `yearSelect` · `month` · `monthGrid` · `panels` · `panel`
 
 Prev/Next 默认内置 SVG chevron，可用对应 slot 替换。
 
 ```tsx
-<Calendar
-  disableDefaultStyles
-  slots={{
-    root: 'section',
-    day: MyDayButton,
-  }}
-  slotProps={{
-    root: { className: 'my-cal' },
-    day: { className: 'my-day' },
-  }}
-/>
+function MyDay({
+  label,
+  selected,
+  today,
+  outside,
+  disabled,
+  children,
+  ...rest
+}: CalendarDaySlotProps) {
+  return (
+    <button
+      type="button"
+      aria-label={label} // 可选：自行决定是否做 a11y
+      aria-pressed={selected || undefined}
+      disabled={disabled}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
+
+<Calendar disableDefaultStyles slots={{ day: MyDay }} />;
 ```
 
-Storybook（`apps/ui-storybook`）里有用 MUI `Paper` / `IconButton` / `Button` 挂满 11 slots 的示例。
+| Slot                      | 类型                       | 显式状态                                                                                |
+| ------------------------- | -------------------------- | --------------------------------------------------------------------------------------- |
+| `day`                     | `CalendarDaySlotProps`     | `label` `date` `selected` `today` `outside` `rangeStart` `rangeEnd` `inRange` `preview` |
+| `prevMonth` / `nextMonth` | `CalendarNavSlotProps`     | `label` `view`                                                                          |
+| `heading`                 | `CalendarHeadingSlotProps` | `label` `view` `drillable`                                                              |
+| `year`                    | `CalendarYearSlotProps`    | `year` `label` `selected`                                                               |
+| `month`                   | `CalendarMonthSlotProps`   | `month` `monthValue` `label` `selected`                                                 |
+
+请把状态字段解构掉，勿整包 spread 到原生 DOM。`CalendarDayProps`（带 `cell`）只给 compound 的 `Calendar.Day` 用。
+
+Storybook（`apps/ui-storybook`）里有用 MUI 挂满 slots 的示例。
 
 ## Compounds
 
@@ -157,7 +239,7 @@ Storybook（`apps/ui-storybook`）里有用 MUI `Paper` / `IconButton` / `Button
 </Calendar.Root>
 ```
 
-可用：`Root` / `Header` / `PrevMonth` / `NextMonth` / `Heading` / `Grid` / `WeekDays` / `Days` / `Day` / `YearSelect` / `MonthGrid`。
+可用：`Root` / `Header` / `PrevMonth` / `NextMonth` / `Heading` / `Grid` / `WeekDays` / `Days` / `Day` / `YearSelect` / `MonthGrid` / `Panels` / `Panel`。
 
 默认 `<Calendar />` 会按 `view` 自动渲染 `YearSelect` / `MonthGrid` / 日网格。
 

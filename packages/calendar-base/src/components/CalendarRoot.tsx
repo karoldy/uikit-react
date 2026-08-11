@@ -5,6 +5,7 @@ import { CalendarContext } from './calendar-context';
 import { renderSlot } from './render-slot';
 
 export function CalendarRoot({
+  selectionMode,
   value,
   defaultValue,
   onChange,
@@ -18,12 +19,15 @@ export function CalendarRoot({
   min,
   max,
   isDateDisabled,
+  dayOf,
   weekStartsOn,
   locale,
   weekdayFormat,
   animated,
   animationClassNames,
   animationDuration,
+  numberOfMonths,
+  showOutsideDays,
   slots,
   slotProps,
   disableDefaultStyles = false,
@@ -32,6 +36,7 @@ export function CalendarRoot({
   ...props
 }: CalendarRootProps) {
   const calendar = useCalendar({
+    selectionMode,
     value,
     defaultValue,
     onChange,
@@ -45,12 +50,15 @@ export function CalendarRoot({
     min,
     max,
     isDateDisabled,
+    dayOf,
     weekStartsOn,
     locale,
     weekdayFormat,
     animated,
     animationClassNames,
     animationDuration,
+    numberOfMonths,
+    showOutsideDays,
   });
 
   const rootSlotProps = (slotProps?.root ?? {}) as Record<string, unknown>;

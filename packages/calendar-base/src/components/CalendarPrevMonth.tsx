@@ -16,30 +16,30 @@ export function CalendarPrevMonth({
   const configured = (slotProps?.prevMonth ?? {}) as Record<string, unknown>;
   const configuredOnClick = configured.onClick as
     ((event: MouseEvent<HTMLElement>) => void) | undefined;
-  const ariaLabel =
+  const label =
     view === 'year' ? 'Previous years' : view === 'month' ? 'Previous year' : 'Previous month';
+  const PrevSlot = slots?.prevMonth;
+  const mergedProps: Record<string, unknown> = {
+    type: 'button',
+    ...props,
+    ...configured,
+    className: cx(
+      !disableDefaultStyles && 'uikit-cal__nav',
+      configured.className as string | undefined,
+      className,
+    ),
+    onClick: composeClickHandlers(
+      configuredOnClick,
+      composeClickHandlers(onClick as ((event: MouseEvent<HTMLElement>) => void) | undefined, () =>
+        goToPrev(),
+      ),
+    ),
+  };
 
-  return renderSlot(
-    slots?.prevMonth,
-    'button',
-    {
-      type: 'button',
-      'aria-label': ariaLabel,
-      ...props,
-      ...configured,
-      className: cx(
-        !disableDefaultStyles && 'uikit-cal__nav',
-        configured.className as string | undefined,
-        className,
-      ),
-      onClick: composeClickHandlers(
-        configuredOnClick,
-        composeClickHandlers(
-          onClick as ((event: MouseEvent<HTMLElement>) => void) | undefined,
-          () => goToPrev(),
-        ),
-      ),
-    },
-    children ?? <ChevronLeftIcon />,
-  );
+  if (PrevSlot && typeof PrevSlot !== 'string') {
+    mergedProps.label = label;
+    mergedProps.view = view;
+  }
+
+  return renderSlot(PrevSlot, 'button', mergedProps, children ?? <ChevronLeftIcon />);
 }

@@ -1,13 +1,21 @@
 import {
+  calendarValueToDateString,
   getTodayString,
+  isCalendarDateRange,
   toMonthString,
-  type DateString,
   type MonthString,
 } from '@uikit-react/calendar-base';
 import { useCallback, useMemo, useState } from 'react';
-import type { UseDatePickerOptions, UseDatePickerReturn } from '../types';
+import type {
+  CalendarDateRange,
+  UseDateRangePickerOptions,
+  UseDateRangePickerReturn,
+} from '../types';
+import { formatDateRange } from '../utils/format-date-range';
 
-export function useDatePicker(options: UseDatePickerOptions = {}): UseDatePickerReturn {
+export function useDateRangePicker(
+  options: UseDateRangePickerOptions = {},
+): UseDateRangePickerReturn {
   const {
     value: controlledValue,
     defaultValue = null,
@@ -19,11 +27,16 @@ export function useDatePicker(options: UseDatePickerOptions = {}): UseDatePicker
     defaultOpen = false,
     onOpenChange,
     closeOnSelect = true,
+    numberOfMonths: numberOfMonthsOption = 1,
   } = options;
 
-  const [uncontrolledValue, setUncontrolledValue] = useState<DateString | null>(defaultValue);
+  const numberOfMonths = Math.max(1, Math.floor(numberOfMonthsOption) || 1);
+  const [uncontrolledValue, setUncontrolledValue] = useState<CalendarDateRange | null>(
+    defaultValue,
+  );
   const [uncontrolledMonth, setUncontrolledMonth] = useState<MonthString>(
-    defaultMonth ?? toMonthString(controlledValue ?? defaultValue ?? getTodayString()),
+    defaultMonth ??
+      toMonthString(calendarValueToDateString(controlledValue ?? defaultValue) ?? getTodayString()),
   );
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
 
@@ -32,11 +45,11 @@ export function useDatePicker(options: UseDatePickerOptions = {}): UseDatePicker
   const open = controlledOpen ?? uncontrolledOpen;
 
   const setValue = useCallback(
-    (date: DateString | null) => {
+    (range: CalendarDateRange | null) => {
       if (controlledValue === undefined) {
-        setUncontrolledValue(date);
+        setUncontrolledValue(range);
       }
-      onChange?.(date);
+      onChange?.(range);
     },
     [controlledValue, onChange],
   );
@@ -61,15 +74,17 @@ export function useDatePicker(options: UseDatePickerOptions = {}): UseDatePicker
     [controlledOpen, onOpenChange],
   );
 
-  const selectDate = useCallback(
-    (date: DateString) => {
-      setValue(date);
-      if (closeOnSelect) {
+  const selectRange = useCallback(
+    (range: CalendarDateRange | null) => {
+      setValue(range);
+      if (closeOnSelect && range?.end !== null && range !== null) {
         setOpen(false);
       }
     },
     [closeOnSelect, setOpen, setValue],
   );
+
+  const displayValue = useMemo(() => formatDateRange(value), [value]);
 
   return useMemo(
     () => ({
@@ -79,26 +94,29 @@ export function useDatePicker(options: UseDatePickerOptions = {}): UseDatePicker
       setMonth,
       open,
       setOpen,
-      selectDate,
+      numberOfMonths,
+      displayValue,
       getTriggerProps: () => ({
         'aria-expanded': open,
         onClick: () => setOpen(!open),
       }),
       getCalendarProps: () => ({
+        selectionMode: 'range' as const,
         value,
         month,
-        onChange: (next: DateString | null | { start: DateString; end: DateString | null }) => {
-          if (typeof next === 'string') {
-            selectDate(next);
+        numberOfMonths,
+        onChange: (next) => {
+          if (next === null) {
+            selectRange(null);
             return;
           }
-          if (next === null) {
-            setValue(null);
+          if (isCalendarDateRange(next)) {
+            selectRange(next);
           }
         },
         onMonthChange: setMonth,
       }),
     }),
-    [month, open, selectDate, setMonth, setOpen, setValue, value],
+    [displayValue, month, numberOfMonths, open, selectRange, setMonth, setOpen, setValue, value],
   );
 }

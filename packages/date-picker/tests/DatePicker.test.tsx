@@ -13,7 +13,7 @@ describe('DatePicker', () => {
     render(<DatePicker defaultMonth="2026-08" placeholder="Choose a date" />);
 
     expect(screen.getByRole('button', { name: 'Choose a date' })).toBeInTheDocument();
-    expect(screen.queryByRole('grid')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'August 15, 2026' })).not.toBeInTheDocument();
   });
 
   it('opens the calendar when its trigger is clicked', async () => {
@@ -22,7 +22,7 @@ describe('DatePicker', () => {
 
     await user.click(screen.getByRole('button', { name: 'Choose a date' }));
 
-    expect(screen.getByRole('grid')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'August 15, 2026' })).toBeInTheDocument();
   });
 
   it('selects a day and closes by default', async () => {
@@ -42,7 +42,7 @@ describe('DatePicker', () => {
 
     expect(onChange).toHaveBeenCalledWith('2026-08-15');
     expect(screen.getByRole('button', { name: '2026-08-15' })).toBeInTheDocument();
-    expect(screen.queryByRole('grid')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'August 15, 2026' })).not.toBeInTheDocument();
   });
 
   it('supports a custom trigger through asChild', async () => {
@@ -55,6 +55,6 @@ describe('DatePicker', () => {
 
     await user.click(screen.getByRole('button', { name: 'Custom trigger' }));
 
-    expect(screen.getByRole('grid')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'August 15, 2026' })).toBeInTheDocument();
   });
 });

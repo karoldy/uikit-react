@@ -1,10 +1,10 @@
 import { Calendar } from '@uikit-react/calendar-base';
 import { Popover } from '@uikit-react/popover';
 import { mergeCalendarSlots } from '../calendar-a11y-slots';
-import { useDatePicker } from '../hooks/use-date-picker';
-import type { DatePickerProps } from '../types';
+import { useDateRangePicker } from '../hooks/use-date-range-picker';
+import type { DateRangePickerProps } from '../types';
 
-export function DatePicker({
+export function DateRangePicker({
   value,
   defaultValue,
   onChange,
@@ -15,16 +15,26 @@ export function DatePicker({
   defaultOpen,
   onOpenChange,
   closeOnSelect,
+  numberOfMonths = 1,
   min,
   max,
   isDateDisabled,
   dayOf,
   weekStartsOn,
   locale,
+  weekdayFormat,
   showOutsideDays,
+  views,
+  defaultView,
+  view,
+  onViewChange,
+  animated,
+  animationClassNames,
+  animationDuration,
   asChild = false,
   children,
-  placeholder = 'Select date',
+  placeholder = 'Select date range',
+  separator = ' – ',
   calendarSlots,
   calendarSlotProps,
   slotProps,
@@ -39,8 +49,8 @@ export function DatePicker({
   constrainViewport,
   minWidth,
   minHeight,
-}: DatePickerProps) {
-  const datePicker = useDatePicker({
+}: DateRangePickerProps) {
+  const rangePicker = useDateRangePicker({
     value,
     defaultValue,
     onChange,
@@ -51,13 +61,18 @@ export function DatePicker({
     defaultOpen,
     onOpenChange,
     closeOnSelect,
+    numberOfMonths,
   });
-  const calendarProps = datePicker.getCalendarProps();
+  const calendarProps = rangePicker.getCalendarProps();
+  const label =
+    rangePicker.value === null
+      ? null
+      : `${rangePicker.value.start}${separator}${rangePicker.value.end ?? '…'}`;
 
   return (
     <Popover.Root
-      open={datePicker.open}
-      onOpenChange={datePicker.setOpen}
+      open={rangePicker.open}
+      onOpenChange={rangePicker.setOpen}
       placement={placement}
       strategy={strategy}
       offset={offset}
@@ -71,7 +86,7 @@ export function DatePicker({
       minHeight={minHeight}
     >
       <Popover.Trigger asChild={asChild} {...slotProps?.trigger}>
-        {children ?? datePicker.value ?? placeholder}
+        {children ?? label ?? placeholder}
       </Popover.Trigger>
       <Popover.Content {...slotProps?.content}>
         <Calendar
@@ -82,7 +97,15 @@ export function DatePicker({
           dayOf={dayOf}
           weekStartsOn={weekStartsOn}
           locale={locale}
+          weekdayFormat={weekdayFormat}
           showOutsideDays={showOutsideDays}
+          views={views}
+          defaultView={defaultView}
+          view={view}
+          onViewChange={onViewChange}
+          animated={animated}
+          animationClassNames={animationClassNames}
+          animationDuration={animationDuration}
           slots={mergeCalendarSlots(calendarSlots)}
           slotProps={calendarSlotProps}
         />
@@ -90,3 +113,6 @@ export function DatePicker({
     </Popover.Root>
   );
 }
+
+/** Alias of {@link DateRangePicker}. */
+export const RangePicker = DateRangePicker;

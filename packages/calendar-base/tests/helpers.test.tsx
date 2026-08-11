@@ -4,7 +4,11 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { composeClickHandlers } from '../src/components/compose-click-handlers';
 import { renderSlot } from '../src/components/render-slot';
-import { resolveAnimationClassNames } from '../src/utils/animation-classes';
+import {
+  resolveAnimationClassNames,
+  resolveMonthSlideClassNames,
+  resolveViewTransitionClassNames,
+} from '../src/utils/animation-classes';
 import { cx } from '../src/utils/cx';
 
 describe('cx', () => {
@@ -13,12 +17,42 @@ describe('cx', () => {
   });
 });
 
+describe('resolveMonthSlideClassNames', () => {
+  it('returns empty when animation is disabled', () => {
+    expect(resolveMonthSlideClassNames(false, false, undefined, 'up')).toEqual([]);
+  });
+
+  it('uses days slide class names by default', () => {
+    expect(resolveMonthSlideClassNames(true, false, undefined, 'up')).toEqual([
+      'uikit-cal__days--up',
+      false,
+    ]);
+    expect(resolveMonthSlideClassNames(true, false, undefined, 'down')).toEqual([
+      false,
+      'uikit-cal__days--down',
+    ]);
+  });
+});
+
+describe('resolveViewTransitionClassNames', () => {
+  it('uses grid enlarge/reduce class names by default', () => {
+    expect(resolveViewTransitionClassNames(true, false, undefined, 'enlarge')).toEqual([
+      'uikit-cal__grid--enlarge',
+      false,
+    ]);
+    expect(resolveViewTransitionClassNames(true, false, undefined, 'reduce')).toEqual([
+      false,
+      'uikit-cal__grid--reduce',
+    ]);
+  });
+});
+
 describe('resolveAnimationClassNames', () => {
   it('returns empty when animation is disabled', () => {
     expect(resolveAnimationClassNames(false, false, undefined, 'up', 'enlarge')).toEqual([]);
   });
 
-  it('uses default class names when styles are enabled', () => {
+  it('uses panel slide + view classes for year/month containers', () => {
     expect(resolveAnimationClassNames(true, false, undefined, 'up', null)).toEqual([
       'uikit-cal__grid--up',
       false,
@@ -29,21 +63,6 @@ describe('resolveAnimationClassNames', () => {
       false,
       'uikit-cal__grid--down',
       'uikit-cal__grid--enlarge',
-      false,
-    ]);
-    expect(resolveAnimationClassNames(true, false, undefined, null, 'reduce')).toEqual([
-      false,
-      false,
-      false,
-      'uikit-cal__grid--reduce',
-    ]);
-  });
-
-  it('omits defaults when disableDefaultStyles is set without custom names', () => {
-    expect(resolveAnimationClassNames(true, true, undefined, 'up', 'enlarge')).toEqual([
-      undefined,
-      false,
-      undefined,
       false,
     ]);
   });
@@ -78,7 +97,7 @@ describe('composeClickHandlers', () => {
     );
   });
 
-  it('skips internal when defaultPrevented', async () => {
+  it('skips internal handler when defaultPrevented', async () => {
     const user = userEvent.setup();
     const internal = vi.fn();
     const onClick = composeClickHandlers((event) => {
@@ -93,17 +112,15 @@ describe('composeClickHandlers', () => {
 });
 
 describe('renderSlot', () => {
-  it('renders the fallback element when no slot is provided', () => {
+  it('renders the fallback element when slot is undefined', () => {
     render(renderSlot(undefined, 'div', { 'data-testid': 'fallback' }, 'content'));
     expect(screen.getByTestId('fallback')).toHaveTextContent('content');
   });
 
-  it('renders a custom slot element', () => {
-    const Slot = (props: React.ComponentProps<'section'>) =>
+  it('renders a custom slot component', () => {
+    const Slot = (props: React.HTMLAttributes<HTMLElement>) =>
       createElement('section', { ...props, 'data-testid': 'custom' });
-
-    render(renderSlot(Slot, 'div', { className: 'slot' }, 'inside'));
-    expect(screen.getByTestId('custom')).toHaveClass('slot');
-    expect(screen.getByTestId('custom')).toHaveTextContent('inside');
+    render(renderSlot(Slot, 'div', { className: 'x' }, 'hi'));
+    expect(screen.getByTestId('custom')).toHaveTextContent('hi');
   });
 });

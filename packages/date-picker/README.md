@@ -1,13 +1,16 @@
 # @uikit-react/date-picker
 
-无样式（headless）弹出式单日期选择器。组合 `@uikit-react/popover` + `@uikit-react/calendar-base`。公共值：`YYYY-MM-DD | null`。
+无样式（headless）弹出式日期选择器。组合 `@uikit-react/popover` + `@uikit-react/calendar-base`。
 
-日历网格与日期工具请用 [`@uikit-react/calendar-base`](../calendar-base/README.md)（本包**不再** re-export `Calendar`）。
+- `DatePicker`：单日 `YYYY-MM-DD | null`
+- `DateRangePicker`（别名 `RangePicker`）：区间 `{ start, end } | null`
+
+日历网格请用 [`@uikit-react/calendar-base`](../calendar-base/README.md)（本包**不** re-export `Calendar`）。
 
 ## 安装
 
 ```ts
-import { DatePicker } from '@uikit-react/date-picker';
+import { DatePicker, DateRangePicker, RangePicker } from '@uikit-react/date-picker';
 ```
 
 Peer：`react` / `react-dom` ^19。依赖：`@uikit-react/calendar-base`、`@uikit-react/popover`。
@@ -16,8 +19,9 @@ Peer：`react` / `react-dom` ^19。依赖：`@uikit-react/calendar-base`、`@uik
 
 ```
 src/
-├── components/   # DatePicker
-├── hooks/        # useDatePicker
+├── components/   # DatePicker, DateRangePicker
+├── hooks/        # useDatePicker, useDateRangePicker
+├── utils/        # formatDateRange
 ├── types/
 └── index.ts
 ```
@@ -27,38 +31,46 @@ src/
 ```tsx
 import { DatePicker } from '@uikit-react/date-picker';
 
-export function Example() {
-  return (
-    <DatePicker defaultValue="2026-08-10" placeholder="Select date">
-      {/* 或 asChild 合并到 MUI Button 等 */}
-    </DatePicker>
-  );
-}
+<DatePicker defaultValue="2026-08-10" placeholder="Select date" />;
 ```
 
 `closeOnSelect` 默认为 `true`。
 
-需要嵌入式日历时：
+## DateRangePicker / RangePicker
 
-```ts
-import { Calendar } from '@uikit-react/calendar-base';
+```tsx
+import { DateRangePicker, RangePicker } from '@uikit-react/date-picker';
+
+// 单面板
+<DateRangePicker defaultMonth="2026-08" placeholder="Select range" />
+
+// 双面板
+<RangePicker numberOfMonths={2} defaultMonth="2026-08" />
+```
+
+- 值：`{ start: 'YYYY-MM-DD'; end: 'YYYY-MM-DD' | null } | null`（选第二日前 `end` 为 `null`）
+- `closeOnSelect`（默认 `true`）：**两端都选完**后才关弹层
+- Trigger 文案：`2026-08-10 – 2026-08-15`；未完成时 `2026-08-10 – …`
+- `separator` 可自定义分隔符（默认 `–`）
+- 支持 hover preview（calendar-base）
+
+```tsx
+const [range, setRange] = useState<CalendarDateRange | null>(null);
+
+<DateRangePicker numberOfMonths={2} value={range} onChange={setRange} defaultMonth="2026-08" />;
 ```
 
 ## 值格式
 
-| 类型 | 格式         | 示例           |
-| ---- | ------------ | -------------- |
-| 日期 | `YYYY-MM-DD` | `"2026-08-10"` |
-| 空值 | `null`       | 未选择         |
+| 组件            | 类型                        | 示例                                         |
+| --------------- | --------------------------- | -------------------------------------------- |
+| DatePicker      | `YYYY-MM-DD \| null`        | `"2026-08-10"`                               |
+| DateRangePicker | `CalendarDateRange \| null` | `{ start: '2026-08-10', end: '2026-08-15' }` |
 
 ## slots / slotProps
 
-- `calendarSlots` / `calendarSlotProps` → 转发 Calendar（如 `day`）
+- `calendarSlots` / `calendarSlotProps` → 转发 Calendar
 - `slotProps.trigger` / `slotProps.content` → Popover
-
-## Follow-ups
-
-见 calendar-base：键盘导航、`data-focused`。
 
 ## 脚本
 
@@ -66,4 +78,5 @@ import { Calendar } from '@uikit-react/calendar-base';
 pnpm --filter @uikit-react/date-picker test
 pnpm --filter @uikit-react/date-picker typecheck
 pnpm --filter @uikit-react/date-picker lint
+pnpm --filter @uikit-react/date-picker build
 ```

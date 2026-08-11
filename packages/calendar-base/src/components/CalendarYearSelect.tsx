@@ -1,7 +1,9 @@
+import { createElement, type MouseEvent } from 'react';
 import type { CalendarYearSelectProps } from '../types';
 import { resolveAnimationClassNames } from '../utils/animation-classes';
 import { cx } from '../utils/cx';
 import { useCalendarContext } from './calendar-context';
+import { composeClickHandlers } from './compose-click-handlers';
 import { renderSlot } from './render-slot';
 
 export function CalendarYearSelect({ className, children, ...props }: CalendarYearSelectProps) {
@@ -19,13 +21,14 @@ export function CalendarYearSelect({ className, children, ...props }: CalendarYe
     viewTransition,
   } = useCalendarContext();
   const configured = (slotProps?.yearSelect ?? {}) as Record<string, unknown>;
+  const yearConfigured = (slotProps?.year ?? {}) as Record<string, unknown>;
   const years = Array.from({ length: 12 }, (_, index) => yearRangeStart + index);
+  const YearSlot = slots?.year ?? 'button';
 
   return renderSlot(
     slots?.yearSelect,
     'div',
     {
-      role: 'grid',
       ...props,
       ...configured,
       className: cx(
@@ -45,20 +48,28 @@ export function CalendarYearSelect({ className, children, ...props }: CalendarYe
       years.map((y) => {
         const selected = y === year;
         const label = yearFormatter.format(new Date(y, 0, 1));
-        return (
-          <button
-            key={y}
-            type="button"
-            className={cx(
-              !disableDefaultStyles && 'uikit-cal__year',
-              !disableDefaultStyles && selected && 'uikit-cal__year--selected',
-            )}
-            aria-pressed={selected || undefined}
-            onClick={() => selectYear(y)}
-          >
-            {label}
-          </button>
-        );
+        const yearOnClick = yearConfigured.onClick as
+          ((event: MouseEvent<HTMLElement>) => void) | undefined;
+        const mergedProps: Record<string, unknown> = {
+          ...yearConfigured,
+          type: YearSlot === 'button' ? 'button' : undefined,
+          className: cx(
+            !disableDefaultStyles && 'uikit-cal__year',
+            !disableDefaultStyles && selected && 'uikit-cal__year--selected',
+            yearConfigured.className as string | undefined,
+          ),
+          onClick: composeClickHandlers(yearOnClick, () => selectYear(y)),
+        };
+
+        if (typeof YearSlot !== 'string') {
+          mergedProps.year = y;
+          mergedProps.label = label;
+          mergedProps.selected = selected;
+        } else if (mergedProps.type === undefined) {
+          delete mergedProps.type;
+        }
+
+        return createElement(YearSlot, { key: y, ...mergedProps }, label);
       }),
   );
 }

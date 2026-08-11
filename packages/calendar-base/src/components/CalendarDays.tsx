@@ -1,38 +1,68 @@
-import type { ReactNode } from 'react';
+import type { MouseEvent } from 'react';
 import type { CalendarDaysProps } from '../types';
+import { resolveMonthSlideClassNames } from '../utils/animation-classes';
 import { cx } from '../utils/cx';
 import { useCalendarContext } from './calendar-context';
 import { CalendarDay } from './CalendarDay';
 import { renderSlot } from './render-slot';
 
-export function CalendarDays({ className, children, ...props }: CalendarDaysProps) {
-  const { cells, slots, slotProps, disableDefaultStyles } = useCalendarContext();
+export function CalendarDays({
+  className,
+  children,
+  onMouseLeave,
+  month: panelMonth,
+  ...props
+}: CalendarDaysProps) {
+  const {
+    panels,
+    cells,
+    slots,
+    slotProps,
+    disableDefaultStyles,
+    selectionMode,
+    setHoveredDate,
+    numberOfMonths,
+    animated,
+    animationClassNames,
+    monthSlideDirection,
+  } = useCalendarContext();
   const configured = (slotProps?.days ?? {}) as Record<string, unknown>;
-  const rows: ReactNode[] = [];
-
-  for (let row = 0; row < 6; row += 1) {
-    rows.push(
-      <div role="row" className={disableDefaultStyles ? undefined : 'uikit-cal__row'} key={row}>
-        {cells.slice(row * 7, row * 7 + 7).map((cell) => (
-          <CalendarDay cell={cell} key={cell.date} />
-        ))}
-      </div>,
-    );
-  }
+  const configuredOnMouseLeave = configured.onMouseLeave as
+    ((event: MouseEvent<HTMLElement>) => void) | undefined;
+  const panelCells =
+    panelMonth === undefined
+      ? cells
+      : (panels.find((panel) => panel.month === panelMonth)?.cells ?? cells);
 
   return renderSlot(
     slots?.days,
     'div',
     {
-      role: 'rowgroup',
       ...props,
       ...configured,
+      onMouseLeave: (event: MouseEvent<HTMLElement>) => {
+        configuredOnMouseLeave?.(event);
+        onMouseLeave?.(event);
+        // Multi-month clears hover on the panels wrapper so preview can span panels.
+        if (!event.defaultPrevented && selectionMode === 'range' && numberOfMonths === 1) {
+          setHoveredDate(null);
+        }
+      },
       className: cx(
         !disableDefaultStyles && 'uikit-cal__days',
+        ...resolveMonthSlideClassNames(
+          animated,
+          disableDefaultStyles,
+          animationClassNames,
+          monthSlideDirection,
+        ),
         configured.className as string | undefined,
         className,
       ),
     },
-    children ?? rows,
+    children ??
+      panelCells.map((cell) => (
+        <CalendarDay cell={cell} key={`${panelMonth ?? 'primary'}-${cell.date}`} />
+      )),
   );
 }
