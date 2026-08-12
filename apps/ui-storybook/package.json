@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^9.3.1",
     "@uikit-react/calendar-base": "workspace:*",
+    "@uikit-react/data-table": "workspace:*",
     "@uikit-react/date-picker": "workspace:*",
     "@uikit-react/popover": "workspace:*",
     "react": "^19.2.8",
