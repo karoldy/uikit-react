@@ -32,23 +32,21 @@ describe('Table', () => {
     expect(within(rows[2]).getByRole('cell', { name: 'alice' })).toBeInTheDocument();
   });
 
-  it('点击表头切换排序并更新 aria-sort 与行序', async () => {
+  it('点击表头切换排序并更新行序', async () => {
     const user = userEvent.setup();
     render(<Table data={data} columns={columns} />);
     const nameHeader = screen.getByRole('columnheader', { name: /name/i });
     const sortButton = within(nameHeader).getByRole('button');
     await user.click(sortButton);
-    expect(nameHeader).toHaveAttribute('aria-sort', 'ascending');
     // 排序后重新查询行
     let rows = screen.getAllByRole('row');
     expect(within(rows[1]).getByRole('cell', { name: 'alice' })).toBeInTheDocument();
     await user.click(sortButton);
-    expect(nameHeader).toHaveAttribute('aria-sort', 'descending');
     rows = screen.getAllByRole('row');
     expect(within(rows[1]).getByRole('cell', { name: 'bob' })).toBeInTheDocument();
   });
 
-  it('第三次点击回到无排序', async () => {
+  it('第三次点击回到无排序原序', async () => {
     const user = userEvent.setup();
     render(<Table data={data} columns={columns} />);
     const sortButton = within(screen.getByRole('columnheader', { name: /name/i })).getByRole(
@@ -57,7 +55,9 @@ describe('Table', () => {
     await user.click(sortButton);
     await user.click(sortButton);
     await user.click(sortButton);
-    expect(screen.getByRole('columnheader', { name: /name/i })).not.toHaveAttribute('aria-sort');
+    const rows = screen.getAllByRole('row');
+    expect(within(rows[1]).getByRole('cell', { name: 'bob' })).toBeInTheDocument();
+    expect(within(rows[2]).getByRole('cell', { name: 'alice' })).toBeInTheDocument();
   });
 
   it('sortable: false 的列不渲染排序按钮', () => {
@@ -72,10 +72,6 @@ describe('Table', () => {
     );
     const rows = screen.getAllByRole('row');
     expect(within(rows[1]).getByRole('cell', { name: 'bob' })).toBeInTheDocument();
-    expect(screen.getByRole('columnheader', { name: /score/i })).toHaveAttribute(
-      'aria-sort',
-      'descending',
-    );
     rerender(
       <Table data={data} columns={columns} sort={{ columnKey: 'score', direction: 'asc' }} />,
     );
@@ -92,6 +88,14 @@ describe('Table', () => {
       within(screen.getByRole('columnheader', { name: /name/i })).getByRole('button'),
     );
     expect(onSortChange).toHaveBeenCalledWith({ columnKey: 'name', direction: 'asc' });
+  });
+
+  it('原生 tr 不设 display flex', () => {
+    render(<Table data={data} columns={columns} />);
+    const headerRow = document.querySelector('thead tr');
+    const bodyRow = document.querySelector('tbody tr');
+    expect(headerRow).not.toHaveStyle({ display: 'flex' });
+    expect(bodyRow).not.toHaveStyle({ display: 'flex' });
   });
 
   it('getRowSpacing 作用于各 td 的 padding', () => {

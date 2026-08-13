@@ -19,10 +19,11 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    }
+    },
+    "./styles.css": "./dist/styles.css"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --target es2022",
+    "build": "tsup src/index.ts --format esm,cjs --dts --target es2022 && cp src/styles/data-table.css dist/styles.css",
     "lint": "oxlint src/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run"

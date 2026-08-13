@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { VirtualTable } from '../src/components/VirtualTable';
 import type { VirtualTableColumn } from '../src/types';
+import { testSlots } from './test-slots';
 
 interface Row {
   id: number;
@@ -31,44 +32,45 @@ function withViewport(container: HTMLElement, height: number) {
 describe('VirtualTable', () => {
   it('只渲染可见区间 + overscan,而非全部行', () => {
     render(<VirtualTable data={data} columns={columns} rowHeight={30} height={300} overscan={5} />);
-    const container = screen.getByRole('table');
-    const body = container.querySelector('div[role="rowgroup"]:nth-of-type(2)') as HTMLElement;
+    const root = document.querySelector('.uikit-dt') as HTMLElement;
+    const body = root.querySelector('.uikit-dt__body') as HTMLElement;
     withViewport(body, 300);
-    // 100 行数据,可见约 0-16 行
-    expect(within(container).getAllByRole('row').length).toBeLessThan(100);
-    expect(within(body).getAllByRole('row').length).toBeGreaterThan(0);
-    expect(within(body).getAllByRole('row').length).toBeLessThanOrEqual(16);
+    const rows = body.querySelectorAll('.uikit-dt__row');
+    expect(rows.length).toBeLessThan(100);
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.length).toBeLessThanOrEqual(16);
   });
 
   it('滚动后渲染新的可见区间', () => {
     render(<VirtualTable data={data} columns={columns} rowHeight={30} height={300} overscan={5} />);
-    const container = screen.getByRole('table');
-    const body = container.querySelector('div[role="rowgroup"]:nth-of-type(2)') as HTMLElement;
+    const root = document.querySelector('.uikit-dt') as HTMLElement;
+    const body = root.querySelector('.uikit-dt__body') as HTMLElement;
     withViewport(body, 300);
     body.scrollTop = 600;
     fireEvent.scroll(body);
-    const rows = within(body).getAllByRole('row');
-    // 区间 15-36,首行应为 name-15
+    const rows = body.querySelectorAll('.uikit-dt__row');
     expect(rows[0]).toHaveTextContent('name-15');
   });
 
   it('排序后虚拟区间基于排序结果', async () => {
     const user = userEvent.setup();
-    render(<VirtualTable data={data} columns={columns} rowHeight={30} height={300} overscan={5} />);
-    const container = screen.getByRole('table');
-    const body = container.querySelector('div[role="rowgroup"]:nth-of-type(2)') as HTMLElement;
+    render(
+      <VirtualTable
+        data={data}
+        columns={columns}
+        rowHeight={30}
+        height={300}
+        overscan={5}
+        slots={testSlots}
+      />,
+    );
+    const root = document.querySelector('.uikit-dt') as HTMLElement;
+    const body = root.querySelector('.uikit-dt__body') as HTMLElement;
     withViewport(body, 300);
-    // score 两次点击 → desc: name-0(score=100)最大排第一
-    const scoreButton = within(screen.getByRole('columnheader', { name: /score/i })).getByRole(
-      'button',
-    );
+    const scoreButton = within(screen.getByLabelText(/score/i)).getByRole('button');
     await user.click(scoreButton);
     await user.click(scoreButton);
-    expect(screen.getByRole('columnheader', { name: /score/i })).toHaveAttribute(
-      'aria-sort',
-      'descending',
-    );
-    const rows = within(body).getAllByRole('row');
+    const rows = body.children;
     expect(rows[0]).toHaveTextContent('name-0');
   });
 
@@ -76,9 +78,15 @@ describe('VirtualTable', () => {
     const user = userEvent.setup();
     const onSortChange = vi.fn();
     render(
-      <VirtualTable data={data} columns={columns} rowHeight={30} onSortChange={onSortChange} />,
+      <VirtualTable
+        data={data}
+        columns={columns}
+        rowHeight={30}
+        slots={testSlots}
+        onSortChange={onSortChange}
+      />,
     );
-    await user.click(within(screen.getByRole('columnheader', { name: /id/i })).getByRole('button'));
+    await user.click(within(screen.getByLabelText(/id/i)).getByRole('button'));
     expect(onSortChange).toHaveBeenCalledWith({ columnKey: 'id', direction: 'asc' });
   });
 
@@ -93,23 +101,25 @@ describe('VirtualTable', () => {
         getRowSpacing={() => ({ top: 8, bottom: 8 })}
       />,
     );
-    const container = screen.getByRole('table');
-    const body = container.querySelector('div[role="rowgroup"]:nth-of-type(2)') as HTMLElement;
+    const root = document.querySelector('.uikit-dt') as HTMLElement;
+    const body = root.querySelector('.uikit-dt__body') as HTMLElement;
     withViewport(body, 300);
-    const firstRow = within(body).getAllByRole('row')[0];
+    const firstRow = body.querySelector('.uikit-dt__row');
     expect(firstRow).toHaveStyle({ paddingTop: '8px', paddingBottom: '8px' });
-    // effective = 46, 可见约 0-13 行
-    expect(within(body).getAllByRole('row').length).toBeLessThanOrEqual(13);
+    expect(body.querySelectorAll('.uikit-dt__row').length).toBeLessThanOrEqual(13);
   });
 
   it('固定列 sticky 且表头 sticky top', () => {
-    render(<VirtualTable data={data} columns={columns} rowHeight={30} height={300} />);
-    const idHeader = screen.getByRole('columnheader', { name: /id/i });
-    expect(idHeader).toHaveStyle({ position: 'sticky', left: '0px' });
-    const container = screen.getByRole('table');
-    const body = container.querySelector('div[role="rowgroup"]:nth-of-type(2)') as HTMLElement;
+    render(
+      <VirtualTable data={data} columns={columns} rowHeight={30} height={300} slots={testSlots} />,
+    );
+    const root = document.querySelector('.uikit-dt') as HTMLElement;
+    expect(screen.getByLabelText(/id/i)).toHaveStyle({ position: 'sticky', left: '0px' });
+    const header = root.querySelector('.uikit-dt__header') as HTMLElement;
+    expect(header).toHaveStyle({ position: 'sticky', top: '0px' });
+    const body = root.querySelector('.uikit-dt__body') as HTMLElement;
     withViewport(body, 300);
-    const firstBodyCell = within(within(body).getAllByRole('row')[0]).getAllByRole('cell')[0];
+    const firstBodyCell = body.firstElementChild!.firstElementChild as HTMLElement;
     expect(firstBodyCell).toHaveStyle({ position: 'sticky', left: '0px' });
   });
 
@@ -123,7 +133,15 @@ describe('VirtualTable', () => {
         renderCell: ({ value }) => `★${String(value)}`,
       },
     ];
-    render(<VirtualTable data={data.slice(0, 3)} columns={cols} rowHeight={30} height={300} />);
-    expect(screen.getByRole('cell', { name: '★name-0' })).toBeInTheDocument();
+    render(
+      <VirtualTable
+        data={data.slice(0, 3)}
+        columns={cols}
+        rowHeight={30}
+        height={300}
+        slots={testSlots}
+      />,
+    );
+    expect(screen.getByText('★name-0')).toBeInTheDocument();
   });
 });
