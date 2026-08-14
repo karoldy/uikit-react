@@ -89,7 +89,7 @@ describe('DataTable', () => {
       <DataTable data={data} columns={columns} slots={testSlots} onSortChange={onSortChange} />,
     );
     await user.click(within(screen.getByLabelText(/name/i)).getByRole('button'));
-    expect(onSortChange).toHaveBeenCalledWith({ columnKey: 'name', direction: 'asc' });
+    expect(onSortChange).toHaveBeenCalledWith([{ columnKey: 'name', direction: 'asc' }]);
   });
 
   it('div 表头行与数据行是 flex 行,列宽才能生效', () => {

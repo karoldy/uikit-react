@@ -87,7 +87,41 @@ describe('Table', () => {
     await user.click(
       within(screen.getByRole('columnheader', { name: /name/i })).getByRole('button'),
     );
-    expect(onSortChange).toHaveBeenCalledWith({ columnKey: 'name', direction: 'asc' });
+    expect(onSortChange).toHaveBeenCalledWith([{ columnKey: 'name', direction: 'asc' }]);
+  });
+
+  it('Shift+click 追加第二列排序', async () => {
+    const user = userEvent.setup();
+    const onSortChange = vi.fn();
+    render(<Table data={data} columns={columns} onSortChange={onSortChange} />);
+    await user.click(
+      within(screen.getByRole('columnheader', { name: /name/i })).getByRole('button'),
+    );
+    await user.keyboard('{Shift>}');
+    await user.click(
+      within(screen.getByRole('columnheader', { name: /score/i })).getByRole('button'),
+    );
+    await user.keyboard('{/Shift}');
+    expect(onSortChange).toHaveBeenLastCalledWith([
+      { columnKey: 'name', direction: 'asc' },
+      { columnKey: 'score', direction: 'asc' },
+    ]);
+  });
+
+  it('multiSort 时单击追加列', async () => {
+    const user = userEvent.setup();
+    const onSortChange = vi.fn();
+    render(<Table data={data} columns={columns} multiSort onSortChange={onSortChange} />);
+    await user.click(
+      within(screen.getByRole('columnheader', { name: /name/i })).getByRole('button'),
+    );
+    await user.click(
+      within(screen.getByRole('columnheader', { name: /score/i })).getByRole('button'),
+    );
+    expect(onSortChange).toHaveBeenLastCalledWith([
+      { columnKey: 'name', direction: 'asc' },
+      { columnKey: 'score', direction: 'asc' },
+    ]);
   });
 
   it('原生 tr 不设 display flex', () => {

@@ -89,7 +89,12 @@ export function TableHeaderCell({
 
   const indicator = renderSortIndicator(sorted === false ? undefined : sorted);
   const defaultChildren: ReactNode = sortable ? (
-    <button type="button" onClick={composeClickHandlers(undefined, () => toggleSort(columnKey))}>
+    <button
+      type="button"
+      onClick={composeClickHandlers(undefined, (event) =>
+        toggleSort(columnKey, event.shiftKey ? { multi: true } : undefined),
+      )}
+    >
       {label}
       {indicator}
     </button>

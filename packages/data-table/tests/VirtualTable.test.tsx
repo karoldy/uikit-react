@@ -87,7 +87,7 @@ describe('VirtualTable', () => {
       />,
     );
     await user.click(within(screen.getByLabelText(/id/i)).getByRole('button'));
-    expect(onSortChange).toHaveBeenCalledWith({ columnKey: 'id', direction: 'asc' });
+    expect(onSortChange).toHaveBeenCalledWith([{ columnKey: 'id', direction: 'asc' }]);
   });
 
   it('getRowSpacing 计入行高并作用于行 padding(常量)', () => {
