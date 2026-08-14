@@ -15,6 +15,27 @@
   grid-template: subgrid / subgrid;
 }
 
+.uikit-vt__header-row {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--uikit-vt-header-bg);
+}
+
+.uikit-vt__header-cell {
+  box-sizing: border-box;
+}
+
+.uikit-vt__header-cell button {
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
 .uikit-vt__cell {
   box-sizing: border-box;
   border: 1px solid var(--uikit-vt-border);
