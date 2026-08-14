@@ -9,7 +9,10 @@ function isSortItem(value: unknown): value is SortItem {
 /** 把 `sort` / `defaultSort` 入参规范成数组。`{}` 与无效项视为无排序。 */
 export function normalizeSort(input?: SortStateInput): SortState {
   if (input === undefined || input === null) return [];
-  if (Array.isArray(input)) return input.filter(isSortItem);
+  if (Array.isArray(input)) {
+    if (input.every(isSortItem)) return input;
+    return input.filter(isSortItem);
+  }
   if (isSortItem(input)) return [{ columnKey: input.columnKey, direction: input.direction }];
   return [];
 }

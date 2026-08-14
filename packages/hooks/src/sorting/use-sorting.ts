@@ -41,7 +41,7 @@ export function useSorting<T>({
 }: UseSortingOptions<T>): UseSortingReturn<T> {
   const [internalSort, setInternalSort] = useState<SortState>(() => normalizeSort(defaultSort));
   const isControlled = controlledSort !== undefined;
-  const sort = normalizeSort(isControlled ? controlledSort : internalSort);
+  const sort = isControlled ? normalizeSort(controlledSort) : internalSort;
 
   const setSort = useCallback(
     (next: SortState) => {

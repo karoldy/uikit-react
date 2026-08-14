@@ -105,4 +105,14 @@ describe('useSorting', () => {
     act(() => result.current.toggleSort('name'));
     expect(onSortChange).toHaveBeenCalledWith([{ columnKey: 'name', direction: 'asc' }]);
   });
+
+  it('非受控: toggle 后无排序变化的 rerender 保持 sortedRows 引用', () => {
+    const { result, rerender } = renderHook(() => useSorting({ data, columns }));
+    act(() => result.current.toggleSort('name'));
+    const sortedAfterToggle = result.current.sortedRows;
+    const sortAfterToggle = result.current.sort;
+    rerender();
+    expect(result.current.sort).toBe(sortAfterToggle);
+    expect(result.current.sortedRows).toBe(sortedAfterToggle);
+  });
 });
