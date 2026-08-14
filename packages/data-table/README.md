@@ -65,7 +65,7 @@ const columns = [
 - `DataTable`：`div` 网格，支持 `renderCell` / `renderHeaderCell` / `flex`
 - `VirtualTable`：同 `div`，`rowHeight` 必填；`Body` 只渲染可见行。列需 `width` 或 `flex` 二选一。`height` 默认 `300`，`overscan` 默认 `5`
 
-排序点击循环：无排序 → `asc` → `desc` → 无排序。默认不画 ↑/↓；未排序无内边框，升序上边、降序下边（`--uikit-dt-sort` 粉色）。仍可通过 `renderSortIndicator` 自定义符号。受控：`sort` + `onSortChange`；非受控：`defaultSort`。
+排序点击循环：无排序 → `asc` → `desc` → 无排序。单击只排一列（点另一列会替换）；**Shift+click** 或 `multiSort` 追加多列，数组顺序即优先级。`onSortChange` 始终回调 `SortItem[]`；`sort` / `defaultSort` 仍接受旧版 `{ columnKey, direction }`。默认不画 ↑/↓；未排序无内边框，升序上边、降序下边（`--uikit-dt-sort` 粉色）。仍可通过 `renderSortIndicator` 自定义符号。
 
 ## Compounds
 
@@ -156,7 +156,7 @@ function MyHeaderCell({
 
 ## 分页
 
-`Pagination` + `usePagination` 独立存在，**不**接进表格。对切片后的数据再传给表格：
+实现已迁到 `@uikit-react/pagination`，data-table 为兼容 re-export。`Pagination` + `usePagination` 独立存在，**不**接进表格。对切片后的数据再传给表格：
 
 ```tsx
 const { page, pageCount, start, end, setPage } = usePagination({

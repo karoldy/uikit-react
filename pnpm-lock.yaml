@@ -153,6 +153,9 @@ importers:
       '@uikit-react/hooks':
         specifier: workspace:*
         version: link:../hooks
+      '@uikit-react/pagination':
+        specifier: workspace:*
+        version: link:../pagination
       react:
         specifier: ^19.0.0
         version: 19.2.8

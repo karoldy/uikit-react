@@ -6,8 +6,21 @@ export type { DataTableProps } from './components/DataTable';
 export { VirtualTable } from './components/VirtualTable';
 export type { VirtualTableProps } from './components/VirtualTable';
 // 独立分页组件
-export { Pagination, defaultPageList } from './components/Pagination';
-export type { PaginationProps, PaginationSlots } from './components/Pagination';
+export {
+  Pagination,
+  defaultPageList,
+  usePagination,
+  getPageCount,
+  clampPage,
+  getPageSlice,
+} from '@uikit-react/pagination';
+export type {
+  PaginationProps,
+  PaginationSlots,
+  UsePaginationOptions,
+  UsePaginationReturn,
+  PageSlice,
+} from '@uikit-react/pagination';
 // 共享 hooks
 export { useSorting, getValue, compareValues, sortRows, normalizeSort } from '@uikit-react/hooks';
 export type {
@@ -22,8 +35,6 @@ export type {
   SortStateInput,
   SortChange,
 } from '@uikit-react/hooks';
-export { usePagination } from './hooks/use-pagination';
-export type { UsePaginationOptions, UsePaginationReturn } from './hooks/use-pagination';
 export { useVirtualRows } from './hooks/use-virtual-rows';
 export type {
   UseVirtualRowsOptions,
@@ -31,8 +42,6 @@ export type {
   VirtualRow,
 } from './hooks/use-virtual-rows';
 // 纯函数工具
-export { getPageCount, clampPage, getPageSlice } from './utils/paginate';
-export type { PageSlice } from './utils/paginate';
 export { getVirtualRange } from './utils/virtual-range';
 export type { VirtualRange, VirtualRangeOptions } from './utils/virtual-range';
 export { getStickyOffsets, getStickyStyle } from './utils/sticky';

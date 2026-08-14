@@ -48,6 +48,7 @@
     "node": ">=16"
   },
   "dependencies": {
-    "@uikit-react/hooks": "workspace:*"
+    "@uikit-react/hooks": "workspace:*",
+    "@uikit-react/pagination": "workspace:*"
   }
 }
