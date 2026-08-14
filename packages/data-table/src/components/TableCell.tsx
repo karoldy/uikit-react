@@ -2,7 +2,7 @@ import { useContext, type CSSProperties, type HTMLAttributes, type ReactNode } f
 import type { DataTableColumn } from '../types/column';
 import { columnStyle } from '../utils/column-style';
 import { cx } from '../utils/cx';
-import { getValue } from '../utils/get-value';
+import { getValue } from '@uikit-react/hooks';
 import { getStickyStyle } from '../utils/sticky';
 import { defaultSlotClass } from './default-slot-class';
 import { renderSlot } from './render-slot';

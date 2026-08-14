@@ -1,6 +1,6 @@
 import type { ElementType, ReactNode } from 'react';
+import type { SortDirection } from '@uikit-react/hooks';
 import type { ColumnBase } from './column';
-import type { SortDirection } from './sorting';
 
 export type SlotPropsOf = Record<string, unknown>;
 

@@ -1,5 +1,5 @@
 import { createContext, useContext, type Key, type ReactNode } from 'react';
-import type { UseSortingReturn } from '../hooks/use-sorting';
+import type { SortDirection, SortState, UseSortingReturn } from '@uikit-react/hooks';
 import type { ColumnBase } from '../types/column';
 import type {
   DataTableSlotProps,
@@ -8,7 +8,6 @@ import type {
   TableFallbacks,
   TableMarkup,
 } from '../types/slots';
-import type { SortState } from '../types/sorting';
 
 export interface TableContextValue<T = unknown> {
   markup: TableMarkup;
@@ -21,7 +20,7 @@ export interface TableContextValue<T = unknown> {
   stickyOffsets: Map<string, { left?: number; right?: number }>;
   getRowSpacing?: GetRowSpacing<T>;
   getRowKey?: (row: T, index: number) => Key;
-  renderSortIndicator: (direction: SortState['direction']) => ReactNode;
+  renderSortIndicator: (direction: SortDirection | undefined) => ReactNode;
   slots?: DataTableSlots;
   slotProps?: DataTableSlotProps;
   disableDefaultStyles: boolean;

@@ -1,9 +1,7 @@
 import type { ReactNode } from 'react';
+import type { Accessor } from '@uikit-react/hooks';
 
-/**
- * 行数据访问器: 键名或取值函数。
- */
-export type Accessor<T> = keyof T | ((row: T) => unknown);
+export type { Accessor };
 
 /**
  * 列模型单一来源。三种表格共享:

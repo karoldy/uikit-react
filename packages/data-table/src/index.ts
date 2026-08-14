@@ -9,8 +9,19 @@ export type { VirtualTableProps } from './components/VirtualTable';
 export { Pagination, defaultPageList } from './components/Pagination';
 export type { PaginationProps, PaginationSlots } from './components/Pagination';
 // 共享 hooks
-export { useSorting } from './hooks/use-sorting';
-export type { UseSortingOptions, UseSortingReturn } from './hooks/use-sorting';
+export { useSorting, getValue, compareValues, sortRows, normalizeSort } from '@uikit-react/hooks';
+export type {
+  Accessor,
+  ToggleSortOptions,
+  UseSortingOptions,
+  UseSortingReturn,
+  SortDirection,
+  SortItem,
+  SortState,
+  SortStateSingle,
+  SortStateInput,
+  SortChange,
+} from '@uikit-react/hooks';
 export { usePagination } from './hooks/use-pagination';
 export type { UsePaginationOptions, UsePaginationReturn } from './hooks/use-pagination';
 export { useVirtualRows } from './hooks/use-virtual-rows';
@@ -20,8 +31,6 @@ export type {
   VirtualRow,
 } from './hooks/use-virtual-rows';
 // 纯函数工具
-export { getValue } from './utils/get-value';
-export { compareValues, sortRows } from './utils/sort-rows';
 export { getPageCount, clampPage, getPageSlice } from './utils/paginate';
 export type { PageSlice } from './utils/paginate';
 export { getVirtualRange } from './utils/virtual-range';
