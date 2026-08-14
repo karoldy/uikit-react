@@ -166,6 +166,49 @@ describe('VirtualTable', () => {
     expect(onSortChange).toHaveBeenCalledWith([{ columnKey: 'id', direction: 'asc' }]);
   });
 
+  it('Shift+click 追加第二列排序', () => {
+    const onSortChange = vi.fn();
+    stubViewport({ width: 400, height: 300 });
+    render(
+      <VirtualTable
+        data={rows100}
+        columns={cols}
+        rowHeight={30}
+        height={300}
+        overscan={4}
+        onSortChange={onSortChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'ID' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Score' }), { shiftKey: true });
+    expect(onSortChange).toHaveBeenLastCalledWith([
+      { columnKey: 'id', direction: 'asc' },
+      { columnKey: 'score', direction: 'asc' },
+    ]);
+  });
+
+  it('multiSort 时单击追加列', () => {
+    const onSortChange = vi.fn();
+    stubViewport({ width: 400, height: 300 });
+    render(
+      <VirtualTable
+        data={rows100}
+        columns={cols}
+        rowHeight={30}
+        height={300}
+        overscan={4}
+        multiSort
+        onSortChange={onSortChange}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'ID' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Score' }));
+    expect(onSortChange).toHaveBeenLastCalledWith([
+      { columnKey: 'id', direction: 'asc' },
+      { columnKey: 'score', direction: 'asc' },
+    ]);
+  });
+
   it('getRowSpacing 计入轨道高度并打在行 padding', () => {
     stubViewport({ width: 400, height: 300 });
     const { container } = render(
