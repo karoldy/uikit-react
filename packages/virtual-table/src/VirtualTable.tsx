@@ -104,7 +104,10 @@ export function VirtualTable<T>({
         ...style,
       }}
     >
-      <div className="uikit-vt__header-row" style={{ position: 'sticky', top: 0, gridRow: 1 }}>
+      <div
+        className="uikit-vt__header-row"
+        style={{ position: 'sticky', top: 0, zIndex: 3, gridRow: 1 }}
+      >
         {visibleColumns.map((colIdx) => {
           const column = columns[colIdx]!;
           const direction = getSortDirection(column.key);
@@ -209,10 +212,10 @@ function getStickyStyles<T>(
 
   return columns.map((column, i) => {
     if (column.fixed === 'left') {
-      return { position: 'sticky', left: leftOffsets[i], zIndex: 1 };
+      return { position: 'sticky', left: leftOffsets[i], zIndex: 2 };
     }
     if (column.fixed === 'right') {
-      return { position: 'sticky', right: rightOffsets[i], zIndex: 1 };
+      return { position: 'sticky', right: rightOffsets[i], zIndex: 2 };
     }
     return undefined;
   });

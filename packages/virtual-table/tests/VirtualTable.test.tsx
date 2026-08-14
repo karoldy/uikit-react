@@ -237,4 +237,63 @@ describe('VirtualTable', () => {
     expect(root.querySelectorAll('.uikit-vt__row').length).toBe(0);
     expect(screen.getByRole('button', { name: 'ID' })).toBeInTheDocument();
   });
+
+  it('第一列 left frozen 为 sticky left 0', () => {
+    stubViewport({ width: 400, height: 300 });
+    const { container } = render(
+      <VirtualTable data={rows100} columns={cols} rowHeight={30} height={300} overscan={4} />,
+    );
+    const root = container.querySelector('.uikit-vt') as HTMLElement;
+    const firstCell = root.querySelector('.uikit-vt__row .uikit-vt__cell') as HTMLElement;
+    expect(firstCell).toHaveStyle({ position: 'sticky', left: '0px' });
+  });
+
+  it('右侧 frozen 为 sticky 且 right 为 0', () => {
+    stubViewport({ width: 400, height: 300 });
+    const rightFrozenCols: VirtualTableColumn<Row>[] = [
+      { key: 'id', accessor: 'id', header: 'ID', width: 80 },
+      { key: 'name', accessor: 'name', header: 'Name', width: 120 },
+      { key: 'score', accessor: 'score', header: 'Score', width: 80, fixed: 'right' },
+    ];
+    const { container } = render(
+      <VirtualTable
+        data={rows100}
+        columns={rightFrozenCols}
+        rowHeight={30}
+        height={300}
+        overscan={4}
+      />,
+    );
+    const root = container.querySelector('.uikit-vt') as HTMLElement;
+    const cells = root.querySelectorAll('.uikit-vt__row .uikit-vt__cell');
+    const rightCell = cells[cells.length - 1] as HTMLElement;
+    expect(rightCell).toHaveStyle({ position: 'sticky', right: '0px' });
+  });
+
+  it('z-index：header 3 / frozen cell 2', () => {
+    stubViewport({ width: 400, height: 300 });
+    const { container } = render(
+      <VirtualTable data={rows100} columns={cols} rowHeight={30} height={300} overscan={4} />,
+    );
+    const root = container.querySelector('.uikit-vt') as HTMLElement;
+    const header = root.querySelector('.uikit-vt__header-row') as HTMLElement;
+    const frozenCell = root.querySelector('.uikit-vt__row .uikit-vt__cell') as HTMLElement;
+    expect(header).toHaveStyle({ zIndex: 3 });
+    expect(frozenCell).toHaveStyle({ zIndex: 2 });
+  });
+
+  it('右侧 frozen 列即使在 overscan 窗外也保持挂载', () => {
+    stubViewport({ width: 400, height: 300 });
+    const columns: VirtualTableColumn<WideRow>[] = [
+      ...wideColumns,
+      { key: 'tail', accessor: 'tail', header: 'Tail', width: 80, fixed: 'right' },
+    ];
+    const rows = wideRows.map((row) => ({ ...row, tail: 1 }));
+    const { container } = render(
+      <VirtualTable data={rows} columns={columns} rowHeight={30} height={300} overscan={4} />,
+    );
+    const root = container.querySelector('.uikit-vt') as HTMLElement;
+    expect(root.scrollLeft).toBe(0);
+    expect(root.textContent).toContain('Tail');
+  });
 });

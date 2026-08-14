@@ -18,7 +18,7 @@
 .uikit-vt__header-row {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 3;
   background: var(--uikit-vt-header-bg);
 }
 
