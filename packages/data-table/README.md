@@ -1,13 +1,13 @@
 # @uikit-react/data-table
 
-三个表格入口，共用同一套 compounds：`Table`（原生 `<table>`）、`DataTable`（`div`）、`VirtualTable`（`div` + 固定 `rowHeight` 的虚拟 Body）。
+两个表格入口，共用同一套 compounds：`Table`（原生 `<table>`）、`DataTable`（`div`）。虚拟化在独立包 `@uikit-react/virtual-table`，不从本包 re-export。
 
 默认 import `styles.css` 后，未替换的节点会挂 `uikit-dt*` class（边框、表头底）。你自己提供的 slot **不会**带这些 class。`disableDefaultStyles` 可关掉全部默认 class。分页是独立组件，不接进表格内部。
 
 ## 安装
 
 ```ts
-import { Table, DataTable, VirtualTable, Pagination, usePagination } from '@uikit-react/data-table';
+import { Table, DataTable, Pagination, usePagination } from '@uikit-react/data-table';
 import '@uikit-react/data-table/styles.css';
 ```
 
@@ -17,9 +17,8 @@ Peer：`react` ^19。
 
 ```
 src/
-├── components/   # Table / DataTable / VirtualTable、compounds、Pagination
-├── hooks/        # useSorting、usePagination、useVirtualRows
-├── utils/        # sort、paginate、virtual-range、sticky、getValue
+├── components/   # Table / DataTable、compounds
+├── utils/        # sticky、cx、column-style
 ├── styles/       # data-table.css（tsup 后 → dist/styles.css）
 ├── types/
 └── index.ts
@@ -28,7 +27,7 @@ src/
 ## 快速开始
 
 ```tsx
-import { DataTable, Pagination, Table, usePagination, VirtualTable } from '@uikit-react/data-table';
+import { DataTable, Pagination, Table, usePagination } from '@uikit-react/data-table';
 import '@uikit-react/data-table/styles.css';
 
 const columns = [
@@ -51,25 +50,18 @@ const columns = [
     },
   ]}
 />;
-
-<VirtualTable
-  data={rows}
-  columns={[{ key: 'name', accessor: 'name', header: 'Name', flex: 1 }]}
-  rowHeight={32}
-  height={320}
-  overscan={5}
-/>;
 ```
 
 - `Table`：原生 `<table>` / `<th>` / `<td>`，单元格纯文本
 - `DataTable`：`div` 网格，支持 `renderCell` / `renderHeaderCell` / `flex`
-- `VirtualTable`：同 `div`，`rowHeight` 必填；`Body` 只渲染可见行。列需 `width` 或 `flex` 二选一。`height` 默认 `300`，`overscan` 默认 `5`
+
+虚拟滚动请用 `@uikit-react/virtual-table`。
 
 排序点击循环：无排序 → `asc` → `desc` → 无排序。单击只排一列（点另一列会替换）；**Shift+click** 或 `multiSort` 追加多列，数组顺序即优先级。`onSortChange` 始终回调 `SortItem[]`；`sort` / `defaultSort` 仍接受旧版 `{ columnKey, direction }`。默认不画 ↑/↓；未排序无内边框，升序上边、降序下边（`--uikit-dt-sort` 粉色）。仍可通过 `renderSortIndicator` 自定义符号。
 
 ## Compounds
 
-三个入口挂同一套 compounds：`Root` / `Header` / `HeaderRow` / `HeaderCell` / `Body` / `Row` / `Cell`（如 `Table.Root`、`DataTable.HeaderCell`、`VirtualTable.Body`）。默认 `<Table />` 等会渲染 Header + Body。
+两个入口挂同一套 compounds：`Root` / `Header` / `HeaderRow` / `HeaderCell` / `Body` / `Row` / `Cell`（如 `Table.Root`、`DataTable.HeaderCell`）。默认 `<Table />` 等会渲染 Header + Body。
 
 ```tsx
 <DataTable.Root data={rows} columns={columns}>
@@ -152,7 +144,7 @@ function MyHeaderCell({
 `getRowSpacing={({ row, index }) => ({ top, bottom })}` 控制行上下 padding：
 
 - 原生 `Table`：padding 打在 Cell（`td`）
-- `div` 的 `DataTable` / `VirtualTable`：padding 打在 Row
+- `div` 的 `DataTable`：padding 打在 Row
 
 ## 分页
 
@@ -170,12 +162,12 @@ const { page, pageCount, start, end, setPage } = usePagination({
 
 ## 导出
 
-| 导出                                   | 说明                                                                     |
-| -------------------------------------- | ------------------------------------------------------------------------ |
-| `Table` / `DataTable` / `VirtualTable` | 三个入口 + compounds                                                     |
-| `Pagination` / `usePagination`         | 外部分页                                                                 |
-| `useSorting` / `useVirtualRows`        | 无头 hooks                                                               |
-| types                                  | `TableColumn` / `DataTableColumn` / `VirtualTableColumn` / slot props 等 |
+| 导出                           | 说明                                              |
+| ------------------------------ | ------------------------------------------------- |
+| `Table` / `DataTable`          | 两个入口 + compounds                              |
+| `Pagination` / `usePagination` | 外部分页（re-export `@uikit-react/pagination`）   |
+| `useSorting`                   | 无头 hook（re-export `@uikit-react/hooks`）       |
+| types                          | `TableColumn` / `DataTableColumn` / slot props 等 |
 
 ## 脚本
 

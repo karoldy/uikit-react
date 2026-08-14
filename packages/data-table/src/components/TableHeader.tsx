@@ -7,16 +7,10 @@ import { useTableContext } from './table-context';
 export type TableHeaderProps = HTMLAttributes<HTMLElement>;
 
 export function TableHeader({ className, children, style, ...props }: TableHeaderProps) {
-  const { slots, slotProps, fallbacks, disableDefaultStyles, rowHeight, markup } =
-    useTableContext();
+  const { slots, slotProps, fallbacks, disableDefaultStyles, markup } = useTableContext();
   const configured = (slotProps?.header ?? {}) as Record<string, unknown>;
   const configuredStyle = configured.style as CSSProperties | undefined;
-  const stickyStyle: CSSProperties | undefined =
-    rowHeight !== undefined
-      ? { position: 'sticky', top: 0, zIndex: 2, display: 'flex' }
-      : markup === 'div'
-        ? { display: 'flex' }
-        : undefined;
+  const layoutStyle: CSSProperties | undefined = markup === 'div' ? { width: '100%' } : undefined;
 
   return renderSlot(
     slots?.header,
@@ -30,7 +24,7 @@ export function TableHeader({ className, children, style, ...props }: TableHeade
         className,
       ),
       style: {
-        ...stickyStyle,
+        ...layoutStyle,
         ...style,
         ...configuredStyle,
       },

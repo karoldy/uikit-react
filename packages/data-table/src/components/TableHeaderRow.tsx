@@ -8,16 +8,11 @@ import { useTableContext } from './table-context';
 export type TableHeaderRowProps = HTMLAttributes<HTMLElement>;
 
 export function TableHeaderRow({ className, children, style, ...props }: TableHeaderRowProps) {
-  const { columns, markup, slots, slotProps, fallbacks, disableDefaultStyles, rowHeight } =
-    useTableContext();
+  const { columns, markup, slots, slotProps, fallbacks, disableDefaultStyles } = useTableContext();
   const configured = (slotProps?.headerRow ?? {}) as Record<string, unknown>;
   const configuredStyle = configured.style as CSSProperties | undefined;
   const layoutStyle: CSSProperties | undefined =
-    markup === 'div'
-      ? rowHeight !== undefined
-        ? { display: 'flex', flex: 1 }
-        : { display: 'flex' }
-      : undefined;
+    markup === 'div' ? { display: 'flex', width: '100%' } : undefined;
 
   return renderSlot(
     slots?.headerRow,

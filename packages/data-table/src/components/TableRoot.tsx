@@ -36,9 +36,6 @@ export interface TableRootProps<T> {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
-  rowHeight?: number;
-  overscan?: number;
-  height?: number;
 }
 
 export function TableRoot<T>({
@@ -58,9 +55,6 @@ export function TableRoot<T>({
   className,
   style,
   children,
-  rowHeight,
-  overscan,
-  height,
   ...props
 }: TableRootProps<T>) {
   const {
@@ -80,10 +74,6 @@ export function TableRoot<T>({
   const fallbacks = markup === 'native' ? NATIVE_FALLBACKS : DIV_FALLBACKS;
   const configured = (slotProps?.root ?? {}) as Record<string, unknown>;
   const configuredStyle = configured.style as CSSProperties | undefined;
-  const virtualStyle: CSSProperties | undefined =
-    rowHeight !== undefined
-      ? { height: height ?? 300, overflowY: 'auto', minHeight: 0 }
-      : undefined;
 
   return (
     <TableContext.Provider
@@ -103,9 +93,6 @@ export function TableRoot<T>({
           slots,
           slotProps,
           disableDefaultStyles,
-          rowHeight,
-          overscan,
-          height,
         } as TableContextValue
       }
     >
@@ -121,7 +108,6 @@ export function TableRoot<T>({
             className,
           ),
           style: {
-            ...virtualStyle,
             ...style,
             ...configuredStyle,
           },

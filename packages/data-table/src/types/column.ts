@@ -4,10 +4,9 @@ import type { Accessor } from '@uikit-react/hooks';
 export type { Accessor };
 
 /**
- * 列模型单一来源。三种表格共享:
- * - `Table`          → `TableColumn`(纯文本渲染)
- * - `DataTable`      → `DataTableColumn`(支持 renderCell / flex)
- * - `VirtualTable`   → `VirtualTableColumn`(width 或 flex 必填)
+ * 列模型单一来源。Table / DataTable 共享:
+ * - `Table`     → `TableColumn`(纯文本渲染)
+ * - `DataTable` → `DataTableColumn`(支持 renderCell / flex)
  */
 export interface ColumnBase<T> {
   /** 稳定列 id,也是排序状态的标识 */
@@ -36,7 +35,7 @@ export interface TableColumn<T> extends ColumnBase<T> {
   header: string;
 }
 
-/** DataTable / VirtualTable 单元格渲染上下文 */
+/** DataTable 单元格渲染上下文 */
 export interface CellContext<T> {
   row: T;
   /** accessor 取出的原始值(可能为 undefined) */
@@ -46,7 +45,7 @@ export interface CellContext<T> {
   index: number;
 }
 
-/** DataTable / VirtualTable 表头渲染上下文 */
+/** DataTable 表头渲染上下文 */
 export interface HeaderContext<T> {
   column: DataTableColumn<T>;
 }
@@ -66,11 +65,3 @@ export interface DataTableColumn<T> extends ColumnBase<T> {
    */
   flex?: number;
 }
-
-/**
- * `<VirtualTable>` 的列定义。虚拟化布局需要确定宽度,
- * 因此 `width` 与 `flex` 二选一必填。
- */
-export type VirtualTableColumn<T> =
-  | (DataTableColumn<T> & { width: number; flex?: never })
-  | (DataTableColumn<T> & { width?: never; flex: number });

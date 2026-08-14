@@ -8,10 +8,7 @@ import { TableRoot, type TableRootProps } from './TableRoot';
 import { TableRow } from './TableRow';
 import { TableChrome } from './table-chrome';
 
-export interface TableProps<T> extends Omit<
-  TableRootProps<T>,
-  'markup' | 'columns' | 'rowHeight' | 'overscan' | 'height'
-> {
+export interface TableProps<T> extends Omit<TableRootProps<T>, 'markup' | 'columns'> {
   columns: readonly TableColumn<T>[];
 }
 

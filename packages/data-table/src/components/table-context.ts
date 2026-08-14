@@ -24,9 +24,6 @@ export interface TableContextValue<T = unknown> {
   slots?: DataTableSlots;
   slotProps?: DataTableSlotProps;
   disableDefaultStyles: boolean;
-  rowHeight?: number;
-  overscan?: number;
-  height?: number;
 }
 
 export const TableContext = createContext<TableContextValue | null>(null);
@@ -35,7 +32,7 @@ export function useTableContext<T = unknown>(): TableContextValue<T> {
   const context = useContext(TableContext);
   if (!context) {
     throw new Error(
-      'Table compound components must be used within <Table.Root>, <DataTable.Root>, or <VirtualTable.Root>',
+      'Table compound components must be used within <Table.Root> or <DataTable.Root>',
     );
   }
   return context as TableContextValue<T>;
