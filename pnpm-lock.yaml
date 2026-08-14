@@ -64,9 +64,15 @@ importers:
       '@uikit-react/date-picker':
         specifier: workspace:*
         version: link:../../packages/date-picker
+      '@uikit-react/pagination':
+        specifier: workspace:*
+        version: link:../../packages/pagination
       '@uikit-react/popover':
         specifier: workspace:*
         version: link:../../packages/popover
+      '@uikit-react/virtual-table':
+        specifier: workspace:*
+        version: link:../../packages/virtual-table
       react:
         specifier: ^19.2.8
         version: 19.2.8

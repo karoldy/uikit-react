@@ -6,12 +6,11 @@ import {
   Pagination,
   Table,
   usePagination,
-  VirtualTable,
   type DataTableColumn,
+  type SortState,
   type TableCellSlotProps,
   type TableColumn,
   type TableHeaderCellSlotProps,
-  type VirtualTableColumn,
 } from '@uikit-react/data-table';
 import '@uikit-react/data-table/styles.css';
 
@@ -22,7 +21,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Workspace `@uikit-react/data-table` — three table flavors (Table / DataTable / VirtualTable) sharing a ColumnBase type system, plus standalone Pagination.',
+          'Workspace `@uikit-react/data-table` — Table and DataTable sharing a ColumnBase type system, plus standalone Pagination.',
       },
     },
   },
@@ -108,28 +107,51 @@ function DataTableDemo() {
   );
 }
 
-export const VirtualTableDemo: Story = {
-  render: () => <VirtualTableDemoView />,
+export const MultiColumnSort: Story = {
+  name: 'Multi-column sort',
+  render: () => <MultiColumnSortDemo />,
 };
 
-function VirtualTableDemoView() {
-  const data = useMemo(() => seed(1000), []);
-  const columns: VirtualTableColumn<Row>[] = [
-    { key: 'id', accessor: 'id', header: 'ID', width: 60, fixed: 'left' },
-    { key: 'name', accessor: 'name', header: 'Name', flex: 1, minWidth: 140 },
-    { key: 'score', accessor: 'score', header: 'Score', width: 90 },
+const multiSortRows: Row[] = [
+  { id: 1, name: 'Alice', score: 90, status: 'active' },
+  { id: 2, name: 'Carol', score: 90, status: 'active' },
+  { id: 3, name: 'Bob', score: 70, status: 'active' },
+  { id: 4, name: 'Eve', score: 90, status: 'pending' },
+  { id: 5, name: 'Dave', score: 70, status: 'pending' },
+  { id: 6, name: 'Frank', score: 70, status: 'closed' },
+  { id: 7, name: 'Gina', score: 50, status: 'closed' },
+  { id: 8, name: 'Hank', score: 90, status: 'closed' },
+];
+
+function MultiColumnSortDemo() {
+  const columns: DataTableColumn<Row>[] = [
+    { key: 'name', accessor: 'name', header: 'Name', flex: 1, minWidth: 120 },
     { key: 'status', accessor: 'status', header: 'Status', width: 110 },
+    { key: 'score', accessor: 'score', header: 'Score', width: 90 },
   ];
+  const [sort, setSort] = useState<SortState>([
+    { columnKey: 'status', direction: 'asc' },
+    { columnKey: 'score', direction: 'desc' },
+  ]);
+  const label =
+    sort.length === 0
+      ? '未排序'
+      : sort.map((item, index) => `${index + 1}. ${item.columnKey} ${item.direction}`).join(' → ');
   return (
     <Paper sx={{ p: 2 }}>
       <Typography variant="subtitle2" gutterBottom>
-        {'`<VirtualTable>`'} — 1000 rows, fixed row height 32, only visible range is rendered.
+        {'`<DataTable multiSort>`'} — 单击追加列；同一列再点：asc → desc → 移除。也可用
+        Shift+click。
       </Typography>
-      <VirtualTable
-        data={data}
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+        当前：{label}
+      </Typography>
+      <DataTable
+        data={multiSortRows}
         columns={columns}
-        rowHeight={32}
-        height={320}
+        sort={sort}
+        onSortChange={setSort}
+        multiSort
         getRowSpacing={() => ({ top: 4, bottom: 4 })}
       />
     </Paper>

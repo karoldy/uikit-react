@@ -18,7 +18,9 @@
     "@uikit-react/calendar-base": "workspace:*",
     "@uikit-react/data-table": "workspace:*",
     "@uikit-react/date-picker": "workspace:*",
+    "@uikit-react/pagination": "workspace:*",
     "@uikit-react/popover": "workspace:*",
+    "@uikit-react/virtual-table": "workspace:*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
