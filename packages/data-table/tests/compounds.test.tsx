@@ -19,7 +19,6 @@ function Probe() {
 it('provides sortedRows to compounds', () => {
   render(
     <TableRoot
-      markup="div"
       data={[{ id: 1 }, { id: 2 }]}
       columns={[{ key: 'id', accessor: 'id', header: 'ID' }]}
     >
@@ -47,7 +46,6 @@ it('HeaderCell toggles sort and custom slot receives sorted', async () => {
   const user = userEvent.setup();
   render(
     <TableRoot
-      markup="div"
       data={[{ name: 'bob' }, { name: 'alice' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
       slots={{ headerCell: Slot }}
@@ -63,10 +61,9 @@ it('HeaderCell toggles sort and custom slot receives sorted', async () => {
   expect(seen).toContain('asc');
 });
 
-it('does not set aria-sort on native th', () => {
+it('does not set aria-sort on default header cell', () => {
   render(
     <TableRoot
-      markup="native"
       data={[{ name: 'bob' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
       sort={{ columnKey: 'name', direction: 'asc' }}
@@ -78,21 +75,20 @@ it('does not set aria-sort on native th', () => {
       </TableHeader>
     </TableRoot>,
   );
-  const th = document.querySelector('th');
-  expect(th).not.toBeNull();
-  expect(th).not.toHaveAttribute('aria-sort');
-  expect(th).not.toHaveAttribute('role');
-  expect(th).not.toHaveAttribute('sorted');
-  expect(th).not.toHaveAttribute('sortable');
-  expect(th).not.toHaveAttribute('label');
-  expect(th).not.toHaveAttribute('fixed');
+  const cell = document.querySelector('.uikit-dt__header-cell');
+  expect(cell).not.toBeNull();
+  expect(cell).not.toHaveAttribute('aria-sort');
+  expect(cell).not.toHaveAttribute('role');
+  expect(cell).not.toHaveAttribute('sorted');
+  expect(cell).not.toHaveAttribute('sortable');
+  expect(cell).not.toHaveAttribute('label');
+  expect(cell).not.toHaveAttribute('fixed');
 });
 
 it('default header sort uses inset classes, not arrow glyphs', async () => {
   const user = userEvent.setup();
   render(
     <TableRoot
-      markup="native"
       data={[{ name: 'bob' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
     >
@@ -103,26 +99,25 @@ it('default header sort uses inset classes, not arrow glyphs', async () => {
       </TableHeader>
     </TableRoot>,
   );
-  const th = document.querySelector('th');
-  expect(th).not.toHaveClass('uikit-dt__header-cell--sorted-asc');
-  expect(th).not.toHaveClass('uikit-dt__header-cell--sorted-desc');
-  expect(th?.textContent).not.toMatch(/[↑↓⇅]/);
+  const cell = document.querySelector('.uikit-dt__header-cell');
+  expect(cell).not.toHaveClass('uikit-dt__header-cell--sorted-asc');
+  expect(cell).not.toHaveClass('uikit-dt__header-cell--sorted-desc');
+  expect(cell?.textContent).not.toMatch(/[↑↓⇅]/);
   await user.click(screen.getByRole('button'));
-  expect(th).toHaveClass('uikit-dt__header-cell--sorted-asc');
-  expect(th).not.toHaveClass('uikit-dt__header-cell--sorted-desc');
-  expect(th?.textContent).not.toMatch(/[↑↓⇅]/);
+  expect(cell).toHaveClass('uikit-dt__header-cell--sorted-asc');
+  expect(cell).not.toHaveClass('uikit-dt__header-cell--sorted-desc');
+  expect(cell?.textContent).not.toMatch(/[↑↓⇅]/);
   await user.click(screen.getByRole('button'));
-  expect(th).toHaveClass('uikit-dt__header-cell--sorted-desc');
-  expect(th).not.toHaveClass('uikit-dt__header-cell--sorted-asc');
+  expect(cell).toHaveClass('uikit-dt__header-cell--sorted-desc');
+  expect(cell).not.toHaveClass('uikit-dt__header-cell--sorted-asc');
   await user.click(screen.getByRole('button'));
-  expect(th).not.toHaveClass('uikit-dt__header-cell--sorted-asc');
-  expect(th).not.toHaveClass('uikit-dt__header-cell--sorted-desc');
+  expect(cell).not.toHaveClass('uikit-dt__header-cell--sorted-asc');
+  expect(cell).not.toHaveClass('uikit-dt__header-cell--sorted-desc');
 });
 
 it('renders null when columnKey is missing', () => {
   render(
     <TableRoot
-      markup="native"
       data={[{ name: 'bob' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
     >
@@ -133,13 +128,12 @@ it('renders null when columnKey is missing', () => {
       </TableHeader>
     </TableRoot>,
   );
-  expect(document.querySelector('th')).toBeNull();
+  expect(document.querySelector('.uikit-dt__header-cell')).toBeNull();
 });
 
 it('Body default-renders rows and Cell shows stringified value', () => {
   render(
     <TableRoot
-      markup="div"
       data={[{ name: 'bob' }, { name: 'alice' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
     >
@@ -161,7 +155,6 @@ it('custom cell slot receives value', () => {
   }
   render(
     <TableRoot
-      markup="div"
       data={[{ name: 'bob' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
       slots={{ cell: Slot }}
@@ -173,27 +166,9 @@ it('custom cell slot receives value', () => {
   expect(document.querySelector('.uikit-dt__cell')).toBeNull();
 });
 
-it('applies getRowSpacing padding on native td, not tr', () => {
+it('applies getRowSpacing margin on row, not cell', () => {
   render(
     <TableRoot
-      markup="native"
-      data={[{ name: 'bob' }]}
-      columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
-      getRowSpacing={() => ({ top: 8, bottom: 4 })}
-    >
-      <TableBody />
-    </TableRoot>,
-  );
-  const td = document.querySelector('td');
-  const tr = document.querySelector('tbody tr');
-  expect(td).toHaveStyle({ paddingTop: '8px', paddingBottom: '4px' });
-  expect((tr as HTMLElement).style.paddingTop).toBe('');
-});
-
-it('applies getRowSpacing padding on div row, not cell', () => {
-  render(
-    <TableRoot
-      markup="div"
       data={[{ name: 'bob' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
       getRowSpacing={() => ({ top: 8, bottom: 4 })}
@@ -203,32 +178,31 @@ it('applies getRowSpacing padding on div row, not cell', () => {
   );
   const row = document.querySelector('.uikit-dt__row');
   const cell = document.querySelector('.uikit-dt__cell');
-  expect(row).toHaveStyle({ paddingTop: '8px', paddingBottom: '4px' });
+  expect(row).toHaveStyle({ marginTop: '8px', marginBottom: '4px' });
+  expect((cell as HTMLElement).style.marginTop).toBe('');
   expect((cell as HTMLElement).style.paddingTop).toBe('');
 });
 
-it('does not leak value onto native td', () => {
+it('does not leak value onto default cell', () => {
   render(
     <TableRoot
-      markup="native"
       data={[{ name: 'bob' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
     >
       <TableBody />
     </TableRoot>,
   );
-  const td = document.querySelector('td');
-  expect(td).not.toBeNull();
-  expect(td).not.toHaveAttribute('value');
-  expect(td).not.toHaveAttribute('row');
-  expect(td).not.toHaveAttribute('index');
-  expect(td).not.toHaveAttribute('column');
+  const cell = document.querySelector('.uikit-dt__cell');
+  expect(cell).not.toBeNull();
+  expect(cell).not.toHaveAttribute('value');
+  expect(cell).not.toHaveAttribute('row');
+  expect(cell).not.toHaveAttribute('index');
+  expect(cell).not.toHaveAttribute('column');
 });
 
 it('renders null when Cell columnKey is missing', () => {
   render(
     <TableRoot
-      markup="native"
       data={[{ name: 'bob' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
     >
@@ -239,13 +213,12 @@ it('renders null when Cell columnKey is missing', () => {
       </TableBody>
     </TableRoot>,
   );
-  expect(document.querySelector('td')).toBeNull();
+  expect(document.querySelector('.uikit-dt__cell')).toBeNull();
 });
 
 it('renders null when Row index is missing', () => {
   render(
     <TableRoot
-      markup="native"
       data={[{ name: 'bob' }]}
       columns={[{ key: 'name', accessor: 'name', header: 'Name' }]}
     >
@@ -256,5 +229,5 @@ it('renders null when Row index is missing', () => {
       </TableBody>
     </TableRoot>,
   );
-  expect(document.querySelector('tbody tr')).toBeNull();
+  expect(document.querySelector('.uikit-dt__row')).toBeNull();
 });

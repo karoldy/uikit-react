@@ -6,11 +6,10 @@ import type {
   DataTableSlots,
   GetRowSpacing,
   TableFallbacks,
-  TableMarkup,
 } from '../types/slots';
+import type { TableLoading } from '../types/loading';
 
 export interface TableContextValue<T = unknown> {
-  markup: TableMarkup;
   fallbacks: TableFallbacks;
   columns: readonly ColumnBase<T>[];
   sortedRows: T[];
@@ -24,6 +23,8 @@ export interface TableContextValue<T = unknown> {
   slots?: DataTableSlots;
   slotProps?: DataTableSlotProps;
   disableDefaultStyles: boolean;
+  loading: TableLoading | false;
+  skeletonRows?: number;
 }
 
 export const TableContext = createContext<TableContextValue | null>(null);

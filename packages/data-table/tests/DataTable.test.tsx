@@ -108,12 +108,12 @@ describe('DataTable', () => {
     expect(nameHeader).toHaveStyle({ flex: '0 0 auto', width: '120px' });
   });
 
-  it('getRowSpacing 作用于行 padding', () => {
+  it('getRowSpacing 作用于行 margin', () => {
     render(
       <DataTable data={data} columns={columns} getRowSpacing={() => ({ top: 8, bottom: 4 })} />,
     );
     const firstRow = document.querySelector('.uikit-dt__row');
-    expect(firstRow).toHaveStyle({ paddingTop: '8px', paddingBottom: '4px' });
+    expect(firstRow).toHaveStyle({ marginTop: '8px', marginBottom: '4px' });
   });
 
   it('固定列应用 sticky 样式', () => {
@@ -125,6 +125,7 @@ describe('DataTable', () => {
     expect(screen.getByLabelText(/id/i)).toHaveStyle({
       position: 'sticky',
       left: '0px',
+      background: 'var(--uikit-dt-header-bg)',
     });
   });
 

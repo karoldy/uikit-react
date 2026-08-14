@@ -3,16 +3,20 @@ import { cx } from '../utils/cx';
 import { defaultSlotClass } from './default-slot-class';
 import { renderSlot } from './render-slot';
 import { TableHeaderCell } from './TableHeaderCell';
+import { TableLoadingLine } from './TableSkeleton';
 import { useTableContext } from './table-context';
 
 export type TableHeaderRowProps = HTMLAttributes<HTMLElement>;
 
 export function TableHeaderRow({ className, children, style, ...props }: TableHeaderRowProps) {
-  const { columns, markup, slots, slotProps, fallbacks, disableDefaultStyles } = useTableContext();
+  const { columns, slots, slotProps, fallbacks, disableDefaultStyles, loading } = useTableContext();
   const configured = (slotProps?.headerRow ?? {}) as Record<string, unknown>;
   const configuredStyle = configured.style as CSSProperties | undefined;
-  const layoutStyle: CSSProperties | undefined =
-    markup === 'div' ? { display: 'flex', width: '100%' } : undefined;
+  const layoutStyle: CSSProperties = { display: 'flex', width: '100%' };
+
+  const cells =
+    children ??
+    columns.map((column) => <TableHeaderCell key={column.key} columnKey={column.key} />);
 
   return renderSlot(
     slots?.headerRow,
@@ -31,7 +35,9 @@ export function TableHeaderRow({ className, children, style, ...props }: TableHe
         ...configuredStyle,
       },
     },
-    children ??
-      columns.map((column) => <TableHeaderCell key={column.key} columnKey={column.key} />),
+    <>
+      {cells}
+      {loading === 'line' ? <TableLoadingLine /> : null}
+    </>,
   );
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getStickyOffsets } from '../src/utils/sticky';
+import { getStickyOffsets, getStickyStyle } from '../src/utils/sticky';
 import type { DataTableColumn } from '../src/types';
 
 interface Row {
@@ -36,5 +36,34 @@ describe('getStickyOffsets', () => {
   it('无 fixed 列返回空映射', () => {
     const offsets = getStickyOffsets([{ key: 'a', accessor: 'id', header: 'A' }]);
     expect(offsets.get('a')).toEqual({});
+  });
+});
+
+describe('getStickyStyle', () => {
+  it('body 冻结列带底和不透明背景', () => {
+    const offsets = getStickyOffsets(columns);
+    expect(getStickyStyle(columns[0]!, offsets, 'cell')).toEqual({
+      position: 'sticky',
+      left: 0,
+      right: undefined,
+      zIndex: 1,
+      background: 'var(--uikit-dt-bg)',
+    });
+  });
+
+  it('header 冻结列 z-index 高于 body，并用表头底', () => {
+    const offsets = getStickyOffsets(columns);
+    expect(getStickyStyle(columns[0]!, offsets, 'header')).toEqual({
+      position: 'sticky',
+      left: 0,
+      right: undefined,
+      zIndex: 3,
+      background: 'var(--uikit-dt-header-bg)',
+    });
+  });
+
+  it('非冻结列返回 undefined', () => {
+    const offsets = getStickyOffsets(columns);
+    expect(getStickyStyle(columns[1]!, offsets, 'cell')).toBeUndefined();
   });
 });

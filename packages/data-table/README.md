@@ -1,6 +1,6 @@
 # @uikit-react/data-table
 
-两个表格入口，共用同一套 compounds：`Table`（原生 `<table>`）、`DataTable`（`div`）。虚拟化在独立包 `@uikit-react/virtual-table`，不从本包 re-export。
+两个表格入口，共用同一套 compounds：`Table` 与 `DataTable` 都是 `div` 网格。`Table` 单元格纯文本；`DataTable` 支持 `renderCell` / `flex`。虚拟化在独立包 `@uikit-react/virtual-table`，不从本包 re-export。
 
 默认 import `styles.css` 后，未替换的节点会挂 `uikit-dt*` class（边框、表头底）。你自己提供的 slot **不会**带这些 class。`disableDefaultStyles` 可关掉全部默认 class。分页是独立组件，不接进表格内部。
 
@@ -19,7 +19,7 @@ Peer：`react` ^19。
 src/
 ├── components/   # Table / DataTable、compounds
 ├── utils/        # sticky、cx、column-style
-├── styles/       # data-table.css（tsup 后 → dist/styles.css）
+├── styles/       # data-table.scss（tsup + esbuild-sass-plugin → dist/styles.css）
 ├── types/
 └── index.ts
 ```
@@ -52,7 +52,7 @@ const columns = [
 />;
 ```
 
-- `Table`：原生 `<table>` / `<th>` / `<td>`，单元格纯文本
+- `Table`：`div` 网格，单元格纯文本。未指定 `width` 的列均分剩余宽度
 - `DataTable`：`div` 网格，支持 `renderCell` / `renderHeaderCell` / `flex`
 
 虚拟滚动请用 `@uikit-react/virtual-table`。
@@ -76,15 +76,17 @@ const columns = [
 
 ## Slots
 
-`root` · `header` · `headerRow` · `headerCell` · `body` · `row` · `cell`
+`root` · `header` · `headerRow` · `headerCell` · `body` · `row` · `cell` · `loadingRow` · `loadingCell` · `loadingLine` · `loadingSpin`
 
-自定义 slot 组件会收到显式状态；内置 `'div'` / `'th'` / `'td'` **不会**把这些字段写到 DOM。
+自定义 slot 组件会收到显式状态；内置 `'div'` **不会**把这些字段写到 DOM。
 
-| Slot         | 类型                       | 显式状态                                     |
-| ------------ | -------------------------- | -------------------------------------------- |
-| `headerCell` | `TableHeaderCellSlotProps` | `sorted` `sortable` `column` `label` `fixed` |
-| `row`        | `TableRowSlotProps`        | `row` `index`                                |
-| `cell`       | `TableCellSlotProps`       | `row` `index` `column` `value`               |
+| Slot          | 类型                        | 显式状态                                     |
+| ------------- | --------------------------- | -------------------------------------------- |
+| `headerCell`  | `TableHeaderCellSlotProps`  | `sorted` `sortable` `column` `label` `fixed` |
+| `row`         | `TableRowSlotProps`         | `row` `index`                                |
+| `cell`        | `TableCellSlotProps`        | `row` `index` `column` `value`               |
+| `loadingRow`  | `TableLoadingRowSlotProps`  | `count` `columns`                            |
+| `loadingCell` | `TableLoadingCellSlotProps` | `count` `columns`                            |
 
 请把状态字段解构掉，勿整包 spread 到原生 DOM。
 
@@ -121,30 +123,59 @@ function MyHeaderCell({
 
 ## 样式
 
-默认 import `styles.css` 后会挂 `uikit-dt*` class。自定义 slot 默认不挂；`disableDefaultStyles` 连内置节点的 class 也关掉。
+默认 import `styles.css` 后会挂 `uikit-dt*` class。自定义 slot 默认不挂；`disableDefaultStyles` 连内置节点的 class 也关掉。`.uikit-dt` 是滚动容器：`height: 100%` 撑满父级、`overflow: auto`、`overscroll-behavior: none`。外层只需要定高度，不要自己再设 overflow。外边框画在 root 上，所以父级定高后底部仍能看到框线，滚动条也在表格上。
+
+单元格边框默认开启，相邻边合并为 1px。`bordered={false}` 关闭（root 会挂 `uikit-dt--borderless`）。
 
 ### CSS 变量
 
-| 变量                   | 用途           |
-| ---------------------- | -------------- |
-| `--uikit-dt-fg`        | 前景色         |
-| `--uikit-dt-border`    | 单元格边框     |
-| `--uikit-dt-header-bg` | 表头底         |
-| `--uikit-dt-cell-pad`  | 单元格 padding |
-| `--uikit-dt-sort`      | 表头排序内边框 |
+| 变量                   | 用途               |
+| ---------------------- | ------------------ |
+| `--uikit-dt-fg`        | 前景色             |
+| `--uikit-dt-bg`        | 单元格底（冻结列） |
+| `--uikit-dt-border`    | 单元格边框         |
+| `--uikit-dt-header-bg` | 表头底             |
+| `--uikit-dt-cell-pad`  | 单元格 padding     |
+| `--uikit-dt-sort`      | 表头排序内边框     |
+| `--uikit-dt-loading`   | 表头 loading 线    |
 
 ### 主要 class
 
-`uikit-dt` · `__header` · `__header-row` · `__header-cell` · `__header-cell--sorted-asc` · `__header-cell--sorted-desc` · `__body` · `__row` · `__cell`
+`uikit-dt` · `uikit-dt--borderless` · `__header` · `__header-row` · `__header-cell` · `__header-cell--sorted-asc` · `__header-cell--sorted-desc` · `__header-cell--frozen` · `__header-cell--frozen-left` · `__header-cell--frozen-right` · `__body` · `__row` · `__row--spaced` · `__row--skeleton` · `__cell` · `__cell--frozen` · `__cell--frozen-left` · `__cell--frozen-right` · `__skeleton` · `__skeleton--row` · `__loading-line` · `__spin` · `__spin-icon`
 
 表格组件**不**注入 `aria-*` / `role` / `data-*`；无障碍由调用方在 slot 上自行决定（与 Calendar 相同）。
 
 ## 间距
 
-`getRowSpacing={({ row, index }) => ({ top, bottom })}` 控制行上下 padding：
+`getRowSpacing={({ row, index }) => ({ top, bottom })}` 控制行上下 margin，打在 Row 上。
 
-- 原生 `Table`：padding 打在 Cell（`td`）
-- `div` 的 `DataTable`：padding 打在 Row
+## Loading
+
+`loading` 四种：`row` 整行骨架、`cell` 按单元格骨架、`line` 表头底部运动线、`spin` Body 中央转圈。
+
+- 无数据：`row` / `cell` / `spin`（传 `line` 会回退成 `row`）
+- 有数据：四种都可用。`line` / `spin` 保留现有行；`row` / `cell` 用骨架替换 body（行数默认等于 `data.length`）
+
+`skeletonRows` 可改骨架行数。无数据时默认 12。四种 loading UI 都是 slot，可整块替换：
+
+```tsx
+function MySpin({ children: _icon, ...rest }: TableLoadingSpinSlotProps) {
+  return (
+    <div {...rest}>
+      <span className="my-spinner" />
+    </div>
+  );
+}
+
+<Table data={rows} columns={columns} loading="spin" slots={{ loadingSpin: MySpin }} />;
+```
+
+```tsx
+<Table data={[]} columns={columns} loading="row" />
+<Table data={[]} columns={columns} loading="cell" skeletonRows={8} />
+<DataTable data={rows} columns={columns} loading="line" />
+<DataTable data={rows} columns={columns} loading="spin" />
+```
 
 ## 分页
 

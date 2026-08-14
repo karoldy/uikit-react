@@ -16,16 +16,8 @@ export interface TableCellProps extends HTMLAttributes<HTMLElement> {
 
 export function TableCell({ columnKey, children, className, style, ...props }: TableCellProps) {
   const rowContext = useContext(TableRowContext);
-  const {
-    columns,
-    markup,
-    getRowSpacing,
-    stickyOffsets,
-    slots,
-    slotProps,
-    fallbacks,
-    disableDefaultStyles,
-  } = useTableContext();
+  const { columns, stickyOffsets, slots, slotProps, fallbacks, disableDefaultStyles } =
+    useTableContext();
   if (!rowContext) return null;
 
   const { row, index } = rowContext;
@@ -34,12 +26,7 @@ export function TableCell({ columnKey, children, className, style, ...props }: T
 
   const value = getValue(row, column.accessor);
   const dt = column as DataTableColumn<unknown>;
-  const content =
-    markup === 'native'
-      ? String(value ?? '')
-      : (dt.renderCell?.({ row, value, column: dt, index }) ?? String(value ?? ''));
-
-  const spacing = markup === 'native' ? getRowSpacing?.({ row, index }) : undefined;
+  const content = dt.renderCell?.({ row, value, column: dt, index }) ?? String(value ?? '');
   const CellSlot = slots?.cell;
   const fallback = fallbacks.cell;
   const slot = CellSlot ?? fallback;
@@ -51,14 +38,29 @@ export function TableCell({ columnKey, children, className, style, ...props }: T
     ...configured,
     className: cx(
       defaultSlotClass(disableDefaultStyles, CellSlot, 'uikit-dt__cell'),
+      defaultSlotClass(
+        disableDefaultStyles,
+        CellSlot,
+        column.fixed ? 'uikit-dt__cell--frozen' : false,
+      ),
+      defaultSlotClass(
+        disableDefaultStyles,
+        CellSlot,
+        column.fixed === 'left' ? 'uikit-dt__cell--frozen-left' : false,
+      ),
+      defaultSlotClass(
+        disableDefaultStyles,
+        CellSlot,
+        column.fixed === 'right' ? 'uikit-dt__cell--frozen-right' : false,
+      ),
       configured.className as string | undefined,
       className,
     ),
     style: {
-      ...columnStyle(column, getStickyStyle(column, stickyOffsets)),
-      ...(spacing ? { paddingTop: spacing.top, paddingBottom: spacing.bottom } : undefined),
-      ...style,
+      ...columnStyle(column, undefined),
       ...configuredStyle,
+      ...style,
+      ...getStickyStyle(column, stickyOffsets, 'cell'),
     },
   };
 

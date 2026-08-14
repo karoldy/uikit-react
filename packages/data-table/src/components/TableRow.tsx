@@ -12,32 +12,31 @@ export interface TableRowProps extends HTMLAttributes<HTMLElement> {
 }
 
 export function TableRow({ index, children, className, style, ...props }: TableRowProps) {
-  const { sortedRows, markup, getRowSpacing, slots, slotProps, fallbacks, disableDefaultStyles } =
+  const { sortedRows, getRowSpacing, slots, slotProps, fallbacks, disableDefaultStyles } =
     useTableContext();
   const row = sortedRows[index];
   if (row === undefined) return null;
 
   const spacing = getRowSpacing?.({ row, index });
+  const spaced = Boolean(spacing && (spacing.top !== 0 || spacing.bottom !== 0));
   const RowSlot = slots?.row;
   const fallback = fallbacks.row;
   const slot = RowSlot ?? fallback;
   const configured = (slotProps?.row ?? {}) as Record<string, unknown>;
   const configuredStyle = configured.style as CSSProperties | undefined;
 
-  const layoutStyle: CSSProperties | undefined =
-    markup === 'div'
-      ? {
-          display: 'flex',
-          width: '100%',
-          ...(spacing ? { paddingTop: spacing.top, paddingBottom: spacing.bottom } : undefined),
-        }
-      : undefined;
+  const layoutStyle: CSSProperties = {
+    display: 'flex',
+    width: '100%',
+    ...(spacing ? { marginTop: spacing.top, marginBottom: spacing.bottom } : undefined),
+  };
 
   const mergedProps: Record<string, unknown> = {
     ...props,
     ...configured,
     className: cx(
       defaultSlotClass(disableDefaultStyles, RowSlot, 'uikit-dt__row'),
+      defaultSlotClass(disableDefaultStyles, RowSlot, spaced && 'uikit-dt__row--spaced'),
       configured.className as string | undefined,
       className,
     ),

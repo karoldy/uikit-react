@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { Table } from '../src/components/Table';
@@ -20,73 +20,65 @@ const data: Row[] = [
   { id: 1, name: 'alice', score: 20 },
 ];
 
+function bodyRows() {
+  return document.querySelectorAll('.uikit-dt__body .uikit-dt__row');
+}
+
 describe('Table', () => {
   it('渲染表头与纯文本单元格', () => {
     render(<Table data={data} columns={columns} />);
-    expect(screen.getByRole('columnheader', { name: /name/i })).toBeInTheDocument();
-    const rows = screen.getAllByRole('row');
-    expect(rows).toHaveLength(3); // 1 header + 2 data
-    // 原序: rows[1]=bob(30), rows[2]=alice(20)
-    expect(within(rows[1]).getByRole('cell', { name: 'bob' })).toBeInTheDocument();
-    expect(within(rows[1]).getByRole('cell', { name: '30' })).toBeInTheDocument();
-    expect(within(rows[2]).getByRole('cell', { name: 'alice' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /name/i })).toBeInTheDocument();
+    const rows = bodyRows();
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveTextContent('bob');
+    expect(rows[0]).toHaveTextContent('30');
+    expect(rows[1]).toHaveTextContent('alice');
   });
 
   it('点击表头切换排序并更新行序', async () => {
     const user = userEvent.setup();
     render(<Table data={data} columns={columns} />);
-    const nameHeader = screen.getByRole('columnheader', { name: /name/i });
-    const sortButton = within(nameHeader).getByRole('button');
+    const sortButton = screen.getByRole('button', { name: /name/i });
     await user.click(sortButton);
-    // 排序后重新查询行
-    let rows = screen.getAllByRole('row');
-    expect(within(rows[1]).getByRole('cell', { name: 'alice' })).toBeInTheDocument();
+    expect(bodyRows()[0]).toHaveTextContent('alice');
     await user.click(sortButton);
-    rows = screen.getAllByRole('row');
-    expect(within(rows[1]).getByRole('cell', { name: 'bob' })).toBeInTheDocument();
+    expect(bodyRows()[0]).toHaveTextContent('bob');
   });
 
   it('第三次点击回到无排序原序', async () => {
     const user = userEvent.setup();
     render(<Table data={data} columns={columns} />);
-    const sortButton = within(screen.getByRole('columnheader', { name: /name/i })).getByRole(
-      'button',
-    );
+    const sortButton = screen.getByRole('button', { name: /name/i });
     await user.click(sortButton);
     await user.click(sortButton);
     await user.click(sortButton);
-    const rows = screen.getAllByRole('row');
-    expect(within(rows[1]).getByRole('cell', { name: 'bob' })).toBeInTheDocument();
-    expect(within(rows[2]).getByRole('cell', { name: 'alice' })).toBeInTheDocument();
+    expect(bodyRows()[0]).toHaveTextContent('bob');
+    expect(bodyRows()[1]).toHaveTextContent('alice');
   });
 
   it('sortable: false 的列不渲染排序按钮', () => {
     const cols: TableColumn<Row>[] = [{ key: 'id', accessor: 'id', header: 'ID', sortable: false }];
     render(<Table data={data} columns={cols} />);
-    expect(within(screen.getByRole('columnheader')).queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(document.querySelector('.uikit-dt__header-cell')).toHaveTextContent('ID');
   });
 
   it('受控 sort 由 props 驱动', () => {
     const { rerender } = render(
       <Table data={data} columns={columns} sort={{ columnKey: 'score', direction: 'desc' }} />,
     );
-    const rows = screen.getAllByRole('row');
-    expect(within(rows[1]).getByRole('cell', { name: 'bob' })).toBeInTheDocument();
+    expect(bodyRows()[0]).toHaveTextContent('bob');
     rerender(
       <Table data={data} columns={columns} sort={{ columnKey: 'score', direction: 'asc' }} />,
     );
-    expect(
-      within(screen.getAllByRole('row')[1]).getByRole('cell', { name: 'alice' }),
-    ).toBeInTheDocument();
+    expect(bodyRows()[0]).toHaveTextContent('alice');
   });
 
   it('onSortChange 回调触发', async () => {
     const user = userEvent.setup();
     const onSortChange = vi.fn();
     render(<Table data={data} columns={columns} onSortChange={onSortChange} />);
-    await user.click(
-      within(screen.getByRole('columnheader', { name: /name/i })).getByRole('button'),
-    );
+    await user.click(screen.getByRole('button', { name: /name/i }));
     expect(onSortChange).toHaveBeenCalledWith([{ columnKey: 'name', direction: 'asc' }]);
   });
 
@@ -94,13 +86,9 @@ describe('Table', () => {
     const user = userEvent.setup();
     const onSortChange = vi.fn();
     render(<Table data={data} columns={columns} onSortChange={onSortChange} />);
-    await user.click(
-      within(screen.getByRole('columnheader', { name: /name/i })).getByRole('button'),
-    );
+    await user.click(screen.getByRole('button', { name: /name/i }));
     await user.keyboard('{Shift>}');
-    await user.click(
-      within(screen.getByRole('columnheader', { name: /score/i })).getByRole('button'),
-    );
+    await user.click(screen.getByRole('button', { name: /score/i }));
     await user.keyboard('{/Shift}');
     expect(onSortChange).toHaveBeenLastCalledWith([
       { columnKey: 'name', direction: 'asc' },
@@ -112,30 +100,60 @@ describe('Table', () => {
     const user = userEvent.setup();
     const onSortChange = vi.fn();
     render(<Table data={data} columns={columns} multiSort onSortChange={onSortChange} />);
-    await user.click(
-      within(screen.getByRole('columnheader', { name: /name/i })).getByRole('button'),
-    );
-    await user.click(
-      within(screen.getByRole('columnheader', { name: /score/i })).getByRole('button'),
-    );
+    await user.click(screen.getByRole('button', { name: /name/i }));
+    await user.click(screen.getByRole('button', { name: /score/i }));
     expect(onSortChange).toHaveBeenLastCalledWith([
       { columnKey: 'name', direction: 'asc' },
       { columnKey: 'score', direction: 'asc' },
     ]);
   });
 
-  it('原生 tr 不设 display flex', () => {
+  it('div 表头行与数据行是 flex 行', () => {
     render(<Table data={data} columns={columns} />);
-    const headerRow = document.querySelector('thead tr');
-    const bodyRow = document.querySelector('tbody tr');
-    expect(headerRow).not.toHaveStyle({ display: 'flex' });
-    expect(bodyRow).not.toHaveStyle({ display: 'flex' });
+    expect(document.querySelector('.uikit-dt__header-row')).toHaveStyle({ display: 'flex' });
+    expect(bodyRows()[0]).toHaveStyle({ display: 'flex' });
   });
 
-  it('getRowSpacing 作用于各 td 的 padding', () => {
+  it('未指定 width 的列表头与单元格使用同一套均分宽度', () => {
+    render(<Table data={data} columns={columns} />);
+    const headerCells = document.querySelectorAll('.uikit-dt__header-cell');
+    const bodyCells = bodyRows()[0]!.querySelectorAll('.uikit-dt__cell');
+    const shared = { flexGrow: '1', flexShrink: '1', flexBasis: '0px', minWidth: '0px' };
+    expect(headerCells[0]).toHaveStyle(shared);
+    expect(headerCells[1]).toHaveStyle(shared);
+    expect(bodyCells[0]).toHaveStyle(shared);
+    expect(bodyCells[1]).toHaveStyle(shared);
+  });
+
+  it('指定 width 的列在表头与单元格上同宽，其余列均分', () => {
+    const cols: TableColumn<Row>[] = [
+      { key: 'id', accessor: 'id', header: 'ID', width: 50, fixed: 'left' },
+      { key: 'name', accessor: 'name', header: 'Name' },
+    ];
+    render(<Table data={data} columns={cols} />);
+    const headerCells = document.querySelectorAll('.uikit-dt__header-cell');
+    const bodyCells = bodyRows()[0]!.querySelectorAll('.uikit-dt__cell');
+    expect(headerCells[0]).toHaveStyle({ flex: '0 0 auto', width: '50px' });
+    expect(bodyCells[0]).toHaveStyle({ flex: '0 0 auto', width: '50px' });
+    expect(headerCells[1]).toHaveStyle({ flexGrow: '1', flexBasis: '0px' });
+    expect(bodyCells[1]).toHaveStyle({ flexGrow: '1', flexBasis: '0px' });
+  });
+
+  it('getRowSpacing 作用于行 margin', () => {
     render(<Table data={data} columns={columns} getRowSpacing={() => ({ top: 8, bottom: 4 })} />);
-    const firstCell = within(screen.getAllByRole('row')[1]).getAllByRole('cell')[0];
-    expect(firstCell).toHaveStyle({ paddingTop: '8px', paddingBottom: '4px' });
+    expect(bodyRows()[0]).toHaveStyle({ marginTop: '8px', marginBottom: '4px' });
+  });
+
+  it('getRowSpacing 时行带 spaced，单元格能画完整上下边框', () => {
+    render(<Table data={data} columns={columns} getRowSpacing={() => ({ top: 8, bottom: 8 })} />);
+    const rows = bodyRows();
+    expect(rows[0]).toHaveClass('uikit-dt__row--spaced');
+    expect(rows[1]).toHaveClass('uikit-dt__row--spaced');
+  });
+
+  it('无 getRowSpacing 时行不带 spaced', () => {
+    render(<Table data={data} columns={columns} />);
+    expect(bodyRows()[0]).not.toHaveClass('uikit-dt__row--spaced');
   });
 
   it('固定列应用 sticky 样式', () => {
@@ -144,18 +162,46 @@ describe('Table', () => {
       { key: 'name', accessor: 'name', header: 'Name' },
     ];
     render(<Table data={data} columns={cols} />);
-    const headerCell = screen.getByRole('columnheader', { name: /id/i });
-    expect(headerCell).toHaveStyle({ position: 'sticky', left: '0px' });
-    const bodyCell = within(screen.getAllByRole('row')[1]).getAllByRole('cell')[0];
-    expect(bodyCell).toHaveStyle({ position: 'sticky', left: '0px' });
+    const headerCell = document.querySelector('.uikit-dt__header-cell');
+    expect(headerCell).toHaveClass('uikit-dt__header-cell--frozen');
+    expect(headerCell).toHaveStyle({
+      position: 'sticky',
+      left: '0px',
+      background: 'var(--uikit-dt-header-bg)',
+    });
+    const bodyCell = bodyRows()[0]!.querySelector('.uikit-dt__cell');
+    expect(bodyCell).toHaveClass('uikit-dt__cell--frozen');
+    expect(bodyCell).toHaveStyle({
+      position: 'sticky',
+      left: '0px',
+      background: 'var(--uikit-dt-bg)',
+    });
+  });
+
+  it('右侧冻结列带 frozen-right', () => {
+    const cols: TableColumn<Row>[] = [
+      { key: 'name', accessor: 'name', header: 'Name' },
+      { key: 'score', accessor: 'score', header: 'Score', width: 80, fixed: 'right' },
+    ];
+    render(<Table data={data} columns={cols} />);
+    const headerCells = document.querySelectorAll('.uikit-dt__header-cell');
+    expect(headerCells[1]).toHaveClass('uikit-dt__header-cell--frozen-right');
+    const bodyCells = bodyRows()[0]!.querySelectorAll('.uikit-dt__cell');
+    expect(bodyCells[1]).toHaveClass('uikit-dt__cell--frozen-right');
   });
 
   it('getRowKey 用于行 key', () => {
-    const { container } = render(
-      <Table data={data} columns={columns} getRowKey={(row) => `row-${row.id}`} />,
-    );
-    const trs = container.querySelectorAll('tbody tr');
-    expect(trs[0].getAttribute('data-key')).toBeNull(); // 仅验证不抛错、渲染正常
-    expect(trs).toHaveLength(2);
+    render(<Table data={data} columns={columns} getRowKey={(row) => `row-${row.id}`} />);
+    expect(bodyRows()).toHaveLength(2);
+  });
+
+  it('默认显示边框', () => {
+    render(<Table data={data} columns={columns} />);
+    expect(document.querySelector('.uikit-dt')).not.toHaveClass('uikit-dt--borderless');
+  });
+
+  it('bordered={false} 关闭边框', () => {
+    render(<Table data={data} columns={columns} bordered={false} />);
+    expect(document.querySelector('.uikit-dt')).toHaveClass('uikit-dt--borderless');
   });
 });

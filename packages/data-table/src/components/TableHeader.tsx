@@ -7,10 +7,10 @@ import { useTableContext } from './table-context';
 export type TableHeaderProps = HTMLAttributes<HTMLElement>;
 
 export function TableHeader({ className, children, style, ...props }: TableHeaderProps) {
-  const { slots, slotProps, fallbacks, disableDefaultStyles, markup } = useTableContext();
+  const { slots, slotProps, fallbacks, disableDefaultStyles } = useTableContext();
   const configured = (slotProps?.header ?? {}) as Record<string, unknown>;
   const configuredStyle = configured.style as CSSProperties | undefined;
-  const layoutStyle: CSSProperties | undefined = markup === 'div' ? { width: '100%' } : undefined;
+  const layoutStyle: CSSProperties = { width: '100%' };
 
   return renderSlot(
     slots?.header,

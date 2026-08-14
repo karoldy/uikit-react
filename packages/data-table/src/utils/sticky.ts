@@ -34,6 +34,7 @@ export function getStickyOffsets<T>(
 export function getStickyStyle<T>(
   column: ColumnBase<T>,
   offsets: Map<string, { left?: number; right?: number }>,
+  variant: 'header' | 'cell' = 'cell',
 ): CSSProperties | undefined {
   if (column.fixed !== 'left' && column.fixed !== 'right') return undefined;
   const offset = offsets.get(column.key) ?? {};
@@ -41,6 +42,7 @@ export function getStickyStyle<T>(
     position: 'sticky',
     left: column.fixed === 'left' ? offset.left : undefined,
     right: column.fixed === 'right' ? offset.right : undefined,
-    zIndex: 1,
+    zIndex: variant === 'header' ? 3 : 1,
+    background: variant === 'header' ? 'var(--uikit-dt-header-bg)' : 'var(--uikit-dt-bg)',
   };
 }

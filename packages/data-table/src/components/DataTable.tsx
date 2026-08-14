@@ -8,24 +8,20 @@ import { TableRoot, type TableRootProps } from './TableRoot';
 import { TableRow } from './TableRow';
 import { TableChrome } from './table-chrome';
 
-export interface DataTableProps<T> extends Omit<TableRootProps<T>, 'markup' | 'columns'> {
+export interface DataTableProps<T> extends Omit<TableRootProps<T>, 'columns'> {
   columns: readonly DataTableColumn<T>[];
-}
-
-function DivRoot<T>(props: Omit<TableRootProps<T>, 'markup'>) {
-  return <TableRoot {...props} markup="div" />;
 }
 
 function DataTableDefault<T>(props: DataTableProps<T>) {
   return (
-    <TableRoot {...props} markup="div">
+    <TableRoot {...props}>
       <TableChrome />
     </TableRoot>
   );
 }
 
 export const DataTable = Object.assign(DataTableDefault, {
-  Root: DivRoot,
+  Root: TableRoot,
   Header: TableHeader,
   HeaderRow: TableHeaderRow,
   HeaderCell: TableHeaderCell,

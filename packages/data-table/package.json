@@ -23,7 +23,7 @@
     "./styles.css": "./dist/styles.css"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --target es2022 && cp src/styles/data-table.css dist/styles.css",
+    "build": "tsup",
     "lint": "oxlint src/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run"
@@ -38,6 +38,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.7.0",
+    "esbuild-sass-plugin": "^3.7.0",
     "jsdom": "^30.0.1",
     "react-dom": "^19.0.0",
     "tsup": "^8.5.1",

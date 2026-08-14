@@ -4,12 +4,11 @@ import { useSorting } from '@uikit-react/hooks';
 import type { ColumnBase } from '../types/column';
 import {
   DIV_FALLBACKS,
-  NATIVE_FALLBACKS,
   type DataTableSlotProps,
   type DataTableSlots,
   type GetRowSpacing,
-  type TableMarkup,
 } from '../types/slots';
+import { resolveLoading, type TableLoading } from '../types/loading';
 import { cx } from '../utils/cx';
 import { getStickyOffsets } from '../utils/sticky';
 import { renderSlot } from './render-slot';
@@ -19,7 +18,6 @@ import { TableContext, type TableContextValue } from './table-context';
 const defaultIndicator = (_direction: SortDirection | undefined): ReactNode => null;
 
 export interface TableRootProps<T> {
-  markup: TableMarkup;
   data: readonly T[];
   columns: readonly ColumnBase<T>[];
   sort?: SortStateInput;
@@ -32,6 +30,15 @@ export interface TableRootProps<T> {
   slots?: DataTableSlots;
   slotProps?: DataTableSlotProps;
   renderSortIndicator?: (direction: SortDirection | undefined) => ReactNode;
+  /** 是否画单元格边框。默认 true；相邻边框合并为 1px */
+  bordered?: boolean;
+  /**
+   * 加载态：`row` 整行骨架、`cell` 按单元格骨架、`line` 表头底运动线、`spin` Body 中央转圈。
+   * 无数据时 `line` 回退为 `row`；`spin` 无数据、有数据都可用。
+   */
+  loading?: TableLoading | false;
+  /** 骨架行数。无数据默认 12；有数据且 row/cell 时默认等于 data.length */
+  skeletonRows?: number;
   disableDefaultStyles?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -39,7 +46,6 @@ export interface TableRootProps<T> {
 }
 
 export function TableRoot<T>({
-  markup,
   data,
   columns,
   sort,
@@ -51,6 +57,9 @@ export function TableRoot<T>({
   slots,
   slotProps,
   renderSortIndicator = defaultIndicator,
+  bordered = true,
+  loading,
+  skeletonRows,
   disableDefaultStyles = false,
   className,
   style,
@@ -71,7 +80,8 @@ export function TableRoot<T>({
     multiSort,
   });
   const stickyOffsets = getStickyOffsets(columns);
-  const fallbacks = markup === 'native' ? NATIVE_FALLBACKS : DIV_FALLBACKS;
+  const fallbacks = DIV_FALLBACKS;
+  const resolvedLoading = resolveLoading(loading, data.length > 0);
   const configured = (slotProps?.root ?? {}) as Record<string, unknown>;
   const configuredStyle = configured.style as CSSProperties | undefined;
 
@@ -79,7 +89,6 @@ export function TableRoot<T>({
     <TableContext.Provider
       value={
         {
-          markup,
           fallbacks,
           columns,
           sortedRows,
@@ -93,6 +102,8 @@ export function TableRoot<T>({
           slots,
           slotProps,
           disableDefaultStyles,
+          loading: resolvedLoading,
+          skeletonRows,
         } as TableContextValue
       }
     >
@@ -104,6 +115,11 @@ export function TableRoot<T>({
           ...configured,
           className: cx(
             defaultSlotClass(disableDefaultStyles, slots?.root, 'uikit-dt'),
+            defaultSlotClass(
+              disableDefaultStyles,
+              slots?.root,
+              !bordered && 'uikit-dt--borderless',
+            ),
             configured.className as string | undefined,
             className,
           ),

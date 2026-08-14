@@ -4,12 +4,17 @@ import { defaultSlotClass } from './default-slot-class';
 import { renderSlot } from './render-slot';
 import { TableCell } from './TableCell';
 import { TableRow } from './TableRow';
+import { TableSkeletonRows, TableLoadingSpin } from './TableSkeleton';
 import { useTableContext } from './table-context';
 
 export type TableBodyProps = HTMLAttributes<HTMLElement>;
 
 function DefaultBodyRows() {
-  const { sortedRows, columns, getRowKey } = useTableContext();
+  const { sortedRows, columns, getRowKey, loading } = useTableContext();
+
+  if (loading === 'row' || loading === 'cell') {
+    return <TableSkeletonRows />;
+  }
 
   return sortedRows.map((_, index) => (
     <TableRow key={getRowKey?.(sortedRows[index], index) ?? index} index={index}>
@@ -21,9 +26,10 @@ function DefaultBodyRows() {
 }
 
 export function TableBody({ className, children, style, ...props }: TableBodyProps) {
-  const { slots, slotProps, fallbacks, disableDefaultStyles } = useTableContext();
+  const { slots, slotProps, fallbacks, disableDefaultStyles, loading } = useTableContext();
   const configured = (slotProps?.body ?? {}) as Record<string, unknown>;
   const configuredStyle = configured.style as CSSProperties | undefined;
+  const content = children ?? <DefaultBodyRows />;
 
   return renderSlot(
     slots?.body,
@@ -41,6 +47,9 @@ export function TableBody({ className, children, style, ...props }: TableBodyPro
         ...configuredStyle,
       },
     },
-    children ?? <DefaultBodyRows />,
+    <>
+      {content}
+      {loading === 'spin' ? <TableLoadingSpin /> : null}
+    </>,
   );
 }

@@ -44,4 +44,12 @@ describe('columnStyle', () => {
     expect(style.flex).toBe('0 0 auto');
     expect(style.width).toBe('120px');
   });
+
+  it('grows equally when width and flex are both omitted', () => {
+    const style = columnStyle({ key: 'a', accessor: 'a', header: 'A' }, undefined);
+    expect(style.flexGrow).toBe(1);
+    expect(style.flexShrink).toBe(1);
+    expect(style.flexBasis).toBe('0px');
+    expect(style.minWidth).toBe(0);
+  });
 });

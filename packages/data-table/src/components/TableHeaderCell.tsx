@@ -62,13 +62,29 @@ export function TableHeaderCell({
         HeaderCellSlot,
         sorted === 'desc' && 'uikit-dt__header-cell--sorted-desc',
       ),
+      defaultSlotClass(
+        disableDefaultStyles,
+        HeaderCellSlot,
+        column.fixed ? 'uikit-dt__header-cell--frozen' : false,
+      ),
+      defaultSlotClass(
+        disableDefaultStyles,
+        HeaderCellSlot,
+        column.fixed === 'left' ? 'uikit-dt__header-cell--frozen-left' : false,
+      ),
+      defaultSlotClass(
+        disableDefaultStyles,
+        HeaderCellSlot,
+        column.fixed === 'right' ? 'uikit-dt__header-cell--frozen-right' : false,
+      ),
       configured.className as string | undefined,
       className,
     ),
     style: {
-      ...columnStyle(column, getStickyStyle(column, stickyOffsets)),
-      ...style,
+      ...columnStyle(column, undefined),
       ...configuredStyle,
+      ...style,
+      ...getStickyStyle(column, stickyOffsets, 'header'),
     },
     onClick:
       configuredOnClick || onClick
