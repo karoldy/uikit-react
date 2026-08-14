@@ -1,5 +1,5 @@
 {
-  "name": "@uikit-react/data-table",
+  "name": "@uikit-react/pagination",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -19,17 +19,17 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    },
-    "./styles.css": "./dist/styles.css"
+    }
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup src/index.ts --format esm,cjs --dts --target es2022",
     "lint": "oxlint src/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run"
   },
   "peerDependencies": {
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.0",
@@ -38,18 +38,12 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.7.0",
-    "esbuild-sass-plugin": "^3.7.0",
     "jsdom": "^30.0.1",
-    "react-dom": "^19.0.0",
     "tsup": "^8.5.1",
-    "typescript": "^5.8.3",
+    "typescript": "^5.7.0",
     "vitest": "^4.1.10"
   },
   "engines": {
     "node": ">=16"
-  },
-  "dependencies": {
-    "@uikit-react/hooks": "workspace:*",
-    "@uikit-react/pagination": "workspace:*"
   }
 }

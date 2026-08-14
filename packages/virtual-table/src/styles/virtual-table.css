@@ -1,0 +1,55 @@
+.uikit-vt {
+  --uikit-vt-border: rgba(0, 0, 0, 0.12);
+  --uikit-vt-header-bg: #fafafa;
+  --uikit-vt-sort: #ec407a;
+
+  display: grid;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.uikit-vt__header-row,
+.uikit-vt__row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template: subgrid / subgrid;
+}
+
+.uikit-vt__header-row {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--uikit-vt-header-bg);
+}
+
+.uikit-vt__header-cell {
+  box-sizing: border-box;
+}
+
+.uikit-vt__header-cell button {
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.uikit-vt__cell {
+  box-sizing: border-box;
+  border: 1px solid var(--uikit-vt-border);
+}
+
+.uikit-vt__header-row .uikit-vt__cell {
+  background: var(--uikit-vt-header-bg);
+  font-weight: 600;
+}
+
+.uikit-vt__cell--sorted-asc {
+  box-shadow: inset 0 2px 0 var(--uikit-vt-sort);
+}
+
+.uikit-vt__cell--sorted-desc {
+  box-shadow: inset 0 -2px 0 var(--uikit-vt-sort);
+}

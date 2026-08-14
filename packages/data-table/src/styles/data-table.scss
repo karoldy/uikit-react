@@ -1,0 +1,219 @@
+.uikit-dt {
+  --uikit-dt-fg: #1a1a1a;
+  --uikit-dt-bg: #fff;
+  --uikit-dt-border: rgba(0, 0, 0, 0.12);
+  --uikit-dt-header-bg: #fafafa;
+  --uikit-dt-cell-pad: 6px 10px;
+  --uikit-dt-sort: #ec407a;
+  --uikit-dt-loading: #1e88e5;
+
+  box-sizing: border-box;
+  color: var(--uikit-dt-fg);
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    sans-serif;
+  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+  overscroll-behavior: none;
+  border: 1px solid var(--uikit-dt-border);
+
+  &__header-row,
+  &__row {
+    display: flex;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  &__header-row {
+    position: relative;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+
+  &__header-cell,
+  &__cell {
+    box-sizing: border-box;
+    min-width: 0;
+    border-style: solid;
+    border-color: var(--uikit-dt-border);
+    border-width: 0 1px 1px 0;
+    padding: var(--uikit-dt-cell-pad);
+  }
+
+  &__header-cell:last-child,
+  &__cell:last-child {
+    border-right-width: 0;
+  }
+
+  &__row:last-child &__cell {
+    border-bottom-width: 0;
+  }
+
+  /* 行被 margin 分开后，补回顶边；最后一行再补底边，避免格子缺框 */
+  &__row--spaced &__cell {
+    border-top-width: 1px;
+  }
+
+  &__row--spaced:last-child &__cell {
+    border-bottom-width: 1px;
+  }
+
+  &__header-cell {
+    background: var(--uikit-dt-header-bg);
+    font-weight: 600;
+
+    > button {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-weight: inherit;
+      text-align: inherit;
+      cursor: pointer;
+
+      &:disabled {
+        cursor: default;
+      }
+    }
+
+    &--sorted-asc {
+      box-shadow: inset 0 2px 0 var(--uikit-dt-sort);
+    }
+
+    &--sorted-desc {
+      box-shadow: inset 0 -2px 0 var(--uikit-dt-sort);
+    }
+  }
+
+  &__header-cell--frozen,
+  &__cell--frozen {
+    background: var(--uikit-dt-bg);
+  }
+
+  &__header-cell--frozen {
+    background: var(--uikit-dt-header-bg);
+  }
+
+  /* 右冻结内侧边：滚动后邻格的右边框会滑走，需自己画左边 */
+  &__header-cell--frozen-right,
+  &__cell--frozen-right {
+    border-left-width: 1px;
+  }
+
+  &--borderless {
+    border: none;
+  }
+
+  &--borderless &__header-cell,
+  &--borderless &__cell {
+    border: none;
+  }
+
+  &__loading-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 5;
+
+    &::after {
+      content: '';
+      display: block;
+      height: 100%;
+      width: 30%;
+      background: var(--uikit-dt-loading);
+      animation: uikit-dt-loading-line 1.2s ease-in-out infinite;
+    }
+  }
+
+  &__skeleton {
+    display: block;
+    height: 12px;
+    width: 64%;
+    max-width: 100%;
+    border-radius: 4px;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.06) 25%,
+      rgba(0, 0, 0, 0.12) 37%,
+      rgba(0, 0, 0, 0.06) 63%
+    );
+    background-size: 400% 100%;
+    animation: uikit-dt-skeleton 1.4s ease infinite;
+  }
+
+  &__skeleton--row {
+    width: auto;
+    flex: 1;
+    margin: 8px 10px;
+  }
+
+  &__spin {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 4;
+    background: rgba(255, 255, 255, 0.48);
+  }
+
+  &__spin-icon {
+    box-sizing: border-box;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--uikit-dt-border);
+    border-top-color: var(--uikit-dt-loading);
+    border-radius: 50%;
+    animation: uikit-dt-spin 0.7s linear infinite;
+  }
+}
+
+@keyframes uikit-dt-skeleton {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@keyframes uikit-dt-loading-line {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(430%);
+  }
+}
+
+@keyframes uikit-dt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

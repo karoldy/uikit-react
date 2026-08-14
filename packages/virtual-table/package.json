@@ -1,5 +1,5 @@
 {
-  "name": "@uikit-react/data-table",
+  "name": "@uikit-react/virtual-table",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -23,22 +23,24 @@
     "./styles.css": "./dist/styles.css"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup src/index.ts --format esm,cjs --dts --target es2022 && cp src/styles/virtual-table.css dist/styles.css",
     "lint": "oxlint src/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run"
   },
   "peerDependencies": {
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@uikit-react/hooks": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.7.0",
-    "esbuild-sass-plugin": "^3.7.0",
     "jsdom": "^30.0.1",
     "react-dom": "^19.0.0",
     "tsup": "^8.5.1",
@@ -47,9 +49,5 @@
   },
   "engines": {
     "node": ">=16"
-  },
-  "dependencies": {
-    "@uikit-react/hooks": "workspace:*",
-    "@uikit-react/pagination": "workspace:*"
   }
 }
