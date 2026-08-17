@@ -1,0 +1,13 @@
+---
+description: Pending table follow-ups — do not start until the user asks
+globs: packages/data-table/**,packages/virtual-table/**,apps/ui-storybook/src/{DataTable,VirtualTable}.stories.tsx
+alwaysApply: false
+---
+
+# Table follow-ups (queued)
+
+Do not implement these until the user explicitly starts a step.
+
+1. **Table** — restore `Table` to its original, most primitive state (native table markup / simplest API; undo the div-grid and extra layout behavior).
+2. **DataTable** — strip excess from `DataTable` (keep the data grid; drop anything that does not belong).
+3. **VirtualTable** — current virtualization is not good enough; rethink the implementation before more incremental patches.
