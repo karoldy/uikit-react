@@ -1,5 +1,5 @@
 {
-  "name": "@uikit-react/virtual-table",
+  "name": "@uikit-react/virtual-grid",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -23,7 +23,7 @@
     "./styles.css": "./dist/styles.css"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --target es2022 && cp src/styles/virtual-table.css dist/styles.css",
+    "build": "tsup src/index.ts --format esm,cjs --dts --target es2022 && cp src/styles/grid.css dist/styles.css",
     "lint": "oxlint src/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run"

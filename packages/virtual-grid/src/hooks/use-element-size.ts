@@ -1,17 +1,19 @@
 import { useLayoutEffect, useState, type RefObject } from 'react';
 
-export function useGridDimensions(ref: RefObject<HTMLElement | null>): {
+export interface ElementSize {
   width: number;
   height: number;
-} {
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+}
+
+export function useElementSize(ref: RefObject<HTMLElement | null>): ElementSize {
+  const [size, setSize] = useState<ElementSize>({ width: 0, height: 0 });
 
   useLayoutEffect(() => {
     const el = ref.current;
-    if (el === null) return;
+    if (!el) return;
 
     const measure = () => {
-      setDimensions({ width: el.clientWidth, height: el.clientHeight });
+      setSize({ width: el.clientWidth, height: el.clientHeight });
     };
 
     measure();
@@ -23,5 +25,5 @@ export function useGridDimensions(ref: RefObject<HTMLElement | null>): {
     return () => observer.disconnect();
   }, [ref]);
 
-  return dimensions;
+  return size;
 }
