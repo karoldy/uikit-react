@@ -1,6 +1,6 @@
 # @uikit-react/data-table
 
-两个表格入口，共用同一套 compounds：`Table` 与 `DataTable` 都是 `div` 网格。`Table` 单元格纯文本；`DataTable` 支持 `renderCell` / `flex`。虚拟化在独立包 `@uikit-react/virtual-table`，不从本包 re-export。
+两个表格入口，共用同一套 compounds：`Table` 与 `DataTable` 都是 `div` 网格。`Table` 单元格纯文本；`DataTable` 支持 `renderCell` / `flex`。虚拟化在独立包 `@uikit-react/virtual-grid`，不从本包 re-export。
 
 默认 import `styles.css` 后，未替换的节点会挂 `uikit-dt*` class（边框、表头底）。你自己提供的 slot **不会**带这些 class。`disableDefaultStyles` 可关掉全部默认 class。分页是独立组件，不接进表格内部。
 
@@ -55,7 +55,7 @@ const columns = [
 - `Table`：`div` 网格，单元格纯文本。未指定 `width` 的列均分剩余宽度
 - `DataTable`：`div` 网格，支持 `renderCell` / `renderHeaderCell` / `flex`
 
-虚拟滚动请用 `@uikit-react/virtual-table`。
+虚拟滚动请用 `@uikit-react/virtual-grid`。
 
 排序点击循环：无排序 → `asc` → `desc` → 无排序。单击只排一列（点另一列会替换）；**Shift+click** 或 `multiSort` 追加多列，数组顺序即优先级。`onSortChange` 始终回调 `SortItem[]`；`sort` / `defaultSort` 仍接受旧版 `{ columnKey, direction }`。默认不画 ↑/↓；未排序无内边框，升序上边、降序下边（`--uikit-dt-sort` 粉色）。仍可通过 `renderSortIndicator` 自定义符号。
 

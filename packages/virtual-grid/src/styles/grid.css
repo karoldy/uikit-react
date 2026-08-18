@@ -25,9 +25,10 @@
   border: 1px solid var(--uikit-grid-border);
   background: var(--uikit-grid-bg);
   padding: 8px 10px;
-  overflow: hidden;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .uikit-grid__cell--odd {

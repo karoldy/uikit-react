@@ -1,11 +1,11 @@
 import {
   useCallback,
+  useEffect,
   useImperativeHandle,
   useRef,
   type CSSProperties,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
-  type WheelEvent,
   type Ref,
 } from 'react';
 import { clamp, cx, scrollStep } from '../utils/cx';
@@ -59,27 +59,40 @@ export function Scroller({
 
   useImperativeHandle(ref, () => ({ scrollTo }), [scrollTo]);
 
-  const onWheel = (event: WheelEvent<HTMLDivElement>) => {
-    if (!hasHorizontal && !hasVertical) return;
+  const onWheelNative = useCallback(
+    (event: globalThis.WheelEvent) => {
+      if (!hasHorizontal && !hasVertical) return;
 
-    event.preventDefault();
-    event.stopPropagation();
+      // Storybook/JSDOM 环境下 wheel 可能会被设置为 passive。
+      // 用原生 listener + passive:false 以确保 preventDefault 不再报错。
+      event.stopPropagation();
 
-    if (hasVertical) {
-      onScrollTop(clamp(scrollTop + scrollStep(event.deltaY), 0, maxTop));
-      onScrollLeft(clamp(scrollLeft + scrollStep(event.deltaX), 0, maxLeft));
-      return;
-    }
+      if (hasVertical) {
+        onScrollTop(clamp(scrollTop + scrollStep(event.deltaY), 0, maxTop));
+        onScrollLeft(clamp(scrollLeft + scrollStep(event.deltaX), 0, maxLeft));
+        return;
+      }
 
-    onScrollLeft(clamp(scrollLeft + scrollStep(event.deltaX || event.deltaY), 0, maxLeft));
-  };
+      onScrollLeft(clamp(scrollLeft + scrollStep(event.deltaX || event.deltaY), 0, maxLeft));
+    },
+    [hasHorizontal, hasVertical, maxLeft, maxTop, onScrollLeft, onScrollTop, scrollLeft, scrollTop],
+  );
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+
+    el.addEventListener('wheel', onWheelNative, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', onWheelNative);
+    };
+  }, [onWheelNative]);
 
   return (
     <div
       ref={rootRef}
       className={cx('uikit-grid__scroller', className)}
       style={{ width, height, ...style }}
-      onWheel={onWheel}
       data-testid="grid-scroller"
     >
       <div className="uikit-grid__viewport" style={{ width, height, position: 'relative' }}>
