@@ -23,7 +23,7 @@
     "./styles.css": "./dist/styles.css"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --target es2022 && cp src/styles/virtual-table.css dist/styles.css",
+    "build": "tsup src/index.ts --format esm,cjs --dts --target es2022 && cp src/styles/grid.css dist/styles.css",
     "lint": "oxlint src/",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run"
@@ -31,9 +31,6 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
-  },
-  "dependencies": {
-    "@uikit-react/hooks": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.0",

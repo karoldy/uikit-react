@@ -1,2 +1,16 @@
-export { VirtualTable } from './VirtualTable';
-export type { GetRowSpacing, RowSpacing, VirtualTableColumn, VirtualTableProps } from './types';
+export { Grid } from './components/Grid';
+export { Cell, WIDTH_BORDER } from './components/Cell';
+export { HCell } from './components/HCell';
+export type {
+  CellAlign,
+  CellBorder,
+  CellProps,
+  Fixed,
+  GridColumn,
+  GridHandle,
+  GridProps,
+  GridRenderContext,
+  MergeCellInfo,
+  GridRow,
+  Size,
+} from './types/grid';

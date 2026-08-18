@@ -18,6 +18,7 @@
     "@uikit-react/calendar-base": "workspace:*",
     "@uikit-react/data-table": "workspace:*",
     "@uikit-react/date-picker": "workspace:*",
+    "@uikit-react/hooks": "workspace:*",
     "@uikit-react/pagination": "workspace:*",
     "@uikit-react/popover": "workspace:*",
     "@uikit-react/virtual-table": "workspace:*",
