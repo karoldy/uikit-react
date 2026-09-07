@@ -1,0 +1,389 @@
+.uikit-tf {
+  --uikit-tf-accent: #1976d2;
+  --uikit-tf-error: #d32f2f;
+  --uikit-tf-text: rgba(0, 0, 0, 0.87);
+  --uikit-tf-label: rgba(0, 0, 0, 0.6);
+  --uikit-tf-border: rgba(0, 0, 0, 0.23);
+  --uikit-tf-hover: rgba(0, 0, 0, 0.87);
+  --uikit-tf-disabled: rgba(0, 0, 0, 0.38);
+  --uikit-tf-filled-bg: rgba(0, 0, 0, 0.06);
+  --uikit-tf-filled-hover: rgba(0, 0, 0, 0.09);
+  --uikit-tf-radius: 4px;
+  --uikit-tf-font: Roboto, Helvetica, Arial, sans-serif;
+
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  vertical-align: top;
+  font-family: var(--uikit-tf-font);
+  color: var(--uikit-tf-text);
+
+  &--full-width {
+    width: 100%;
+  }
+
+  &--error {
+    --uikit-tf-accent: var(--uikit-tf-error);
+  }
+
+  &__field {
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-radius: var(--uikit-tf-radius);
+  }
+
+  &__control {
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    border: 0;
+    margin: 0;
+    display: block;
+    min-width: 0;
+    background: none;
+    outline: 0;
+    box-sizing: content-box;
+    letter-spacing: inherit;
+    animation-duration: 10ms;
+    padding: 16.5px 14px;
+    height: 1.4375em;
+
+    &::placeholder {
+      color: currentColor;
+      opacity: 0;
+    }
+
+    &:disabled {
+      color: var(--uikit-tf-disabled);
+      cursor: default;
+    }
+
+    &--textarea {
+      box-sizing: border-box;
+      height: auto;
+      overflow: hidden;
+      resize: none;
+      padding: 16.5px 14px;
+    }
+  }
+
+  &__label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    pointer-events: none;
+    transform-origin: top left;
+    color: var(--uikit-tf-label);
+    font-size: 1rem;
+    line-height: 1.4375em;
+    letter-spacing: 0.00938em;
+    padding: 0;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 24px);
+    transition:
+      color 200ms cubic-bezier(0, 0, 0.2, 1),
+      transform 200ms cubic-bezier(0, 0, 0.2, 1),
+      max-width 200ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  &__asterisk {
+    color: var(--uikit-tf-error);
+  }
+
+  &__notch {
+    text-align: left;
+    position: absolute;
+    inset: -5px 0 0;
+    margin: 0;
+    padding: 0 8px;
+    pointer-events: none;
+    border-style: solid;
+    border-width: 1px;
+    overflow: hidden;
+    min-width: 0%;
+    border-radius: inherit;
+    border-color: var(--uikit-tf-border);
+  }
+
+  &__legend {
+    float: unset;
+    width: auto;
+    overflow: hidden;
+    display: block;
+    padding: 0;
+    height: 11px;
+    font-size: 0.75em;
+    visibility: hidden;
+    max-width: 0.01px;
+    transition: max-width 50ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+    white-space: nowrap;
+
+    > span {
+      padding-left: 5px;
+      padding-right: 5px;
+      display: inline-block;
+      opacity: 0;
+      visibility: visible;
+    }
+  }
+
+  &__helper {
+    margin: 3px 14px 0;
+    font-size: 0.75rem;
+    line-height: 1.66;
+    letter-spacing: 0.03333em;
+    color: var(--uikit-tf-label);
+    text-align: left;
+  }
+
+  &__adornment {
+    display: flex;
+    max-height: 2em;
+    align-items: center;
+    white-space: nowrap;
+    color: var(--uikit-tf-label);
+
+    &--start {
+      margin-right: 8px;
+      margin-left: 14px;
+    }
+
+    &--end {
+      margin-left: 8px;
+      margin-right: 14px;
+    }
+  }
+
+  &--outlined {
+    .uikit-tf__label {
+      transform: translate(14px, 16px) scale(1);
+    }
+
+    &.uikit-tf--size-small .uikit-tf__label {
+      transform: translate(14px, 9px) scale(1);
+    }
+
+    .uikit-tf__field:hover .uikit-tf__notch {
+      border-color: var(--uikit-tf-hover);
+    }
+
+    &:focus-within .uikit-tf__notch,
+    &:focus-within .uikit-tf__field:hover .uikit-tf__notch,
+    &.uikit-tf--focused .uikit-tf__notch,
+    &.uikit-tf--focused .uikit-tf__field:hover .uikit-tf__notch {
+      border-width: 2px;
+      border-color: var(--uikit-tf-accent);
+    }
+  }
+
+  &--filled {
+    .uikit-tf__field {
+      background: var(--uikit-tf-filled-bg);
+      border-radius: var(--uikit-tf-radius) var(--uikit-tf-radius) 0 0;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-bottom: 1px solid var(--uikit-tf-border);
+        pointer-events: none;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        border-bottom: 2px solid var(--uikit-tf-accent);
+        transform: scaleX(0);
+        transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+        pointer-events: none;
+      }
+
+      &:hover {
+        background: var(--uikit-tf-filled-hover);
+      }
+    }
+
+    .uikit-tf__control {
+      padding: 25px 12px 8px;
+    }
+
+    .uikit-tf__label {
+      transform: translate(12px, 16px) scale(1);
+    }
+
+    &.uikit-tf--size-small .uikit-tf__control {
+      padding: 21px 12px 4px;
+    }
+
+    &.uikit-tf--size-small .uikit-tf__label {
+      transform: translate(12px, 10px) scale(1);
+    }
+  }
+
+  &--standard {
+    .uikit-tf__field {
+      border-radius: 0;
+      border-bottom: 1px solid var(--uikit-tf-border);
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        z-index: 1;
+        border-bottom: 2px solid var(--uikit-tf-accent);
+        transform: scaleX(0);
+        transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+        pointer-events: none;
+      }
+
+      &:hover {
+        border-bottom-color: var(--uikit-tf-hover);
+      }
+    }
+
+    &:has(.uikit-tf__label) .uikit-tf__field {
+      padding-top: 20px;
+    }
+
+    .uikit-tf__control {
+      padding: 0 0 8px;
+    }
+
+    .uikit-tf__label {
+      transform: translate(0, 16px) scale(1);
+    }
+
+    &.uikit-tf--size-small .uikit-tf__label {
+      transform: translate(0, 14px) scale(1);
+    }
+
+    .uikit-tf__helper {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .uikit-tf__adornment--start {
+      margin-left: 0;
+    }
+
+    .uikit-tf__adornment--end {
+      margin-right: 0;
+    }
+  }
+
+  &--size-small.uikit-tf--outlined .uikit-tf__control {
+    padding-top: 8.5px;
+    padding-bottom: 8.5px;
+  }
+
+  .uikit-tf__adornment--start + .uikit-tf__control {
+    padding-left: 0;
+  }
+
+  &:not(:has(.uikit-tf__label)) .uikit-tf__control::placeholder,
+  &:focus-within .uikit-tf__control::placeholder,
+  &--focused .uikit-tf__control::placeholder,
+  &--shrunk .uikit-tf__control::placeholder {
+    opacity: 0.42;
+  }
+
+  &:focus-within,
+  &--shrunk {
+    .uikit-tf__legend {
+      max-width: 100%;
+    }
+
+    &.uikit-tf--outlined .uikit-tf__label {
+      transform: translate(14px, -9px) scale(0.75);
+      max-width: calc(133% - 24px);
+    }
+
+    &.uikit-tf--filled .uikit-tf__label {
+      transform: translate(12px, 7px) scale(0.75);
+    }
+
+    &.uikit-tf--standard .uikit-tf__label {
+      transform: translate(0, -1.5px) scale(0.75);
+    }
+  }
+
+  &:focus-within,
+  &--focused {
+    .uikit-tf__label {
+      color: var(--uikit-tf-accent);
+    }
+
+    .uikit-tf__notch,
+    .uikit-tf__field:hover .uikit-tf__notch {
+      border-width: 2px;
+      border-color: var(--uikit-tf-accent);
+    }
+
+    &.uikit-tf--filled .uikit-tf__field::after,
+    &.uikit-tf--standard .uikit-tf__field::after {
+      transform: scaleX(1);
+    }
+  }
+
+  &--error {
+    .uikit-tf__label,
+    .uikit-tf__helper {
+      color: var(--uikit-tf-error);
+    }
+
+    .uikit-tf__notch {
+      border-color: var(--uikit-tf-error);
+    }
+
+    &.uikit-tf--filled .uikit-tf__field::before {
+      border-bottom-color: var(--uikit-tf-error);
+    }
+
+    &.uikit-tf--standard .uikit-tf__field {
+      border-bottom-color: var(--uikit-tf-error);
+    }
+  }
+
+  &--disabled {
+    pointer-events: none;
+
+    .uikit-tf__label,
+    .uikit-tf__helper,
+    .uikit-tf__adornment {
+      color: var(--uikit-tf-disabled);
+    }
+
+    .uikit-tf__notch {
+      border-color: var(--uikit-tf-disabled);
+    }
+
+    &.uikit-tf--filled .uikit-tf__field {
+      background: rgba(0, 0, 0, 0.12);
+
+      &::before {
+        border-bottom-style: dotted;
+      }
+    }
+
+    &.uikit-tf--standard .uikit-tf__field {
+      border-bottom-style: dotted;
+    }
+  }
+}

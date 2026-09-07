@@ -11,7 +11,8 @@ uikit-react/
 │   ├── popover/       # Popover 浮层
 │   ├── calendar-base/ # 无样式日历网格与日期工具
 │   ├── data-table/    # 数据表格组件
-│   └── date-picker/   # 弹出式日期选择器
+│   ├── date-picker/   # 弹出式日期选择器
+│   └── text-field/    # TextField（MUI props，SCSS 样式）
 ├── apps/
 │   ├── ui-storybook/  # 组件 Storybook 演示
 │   └── ui-docs/       # 组件文档站点
@@ -20,13 +21,14 @@ uikit-react/
 
 ## Packages
 
-| 包名            | 描述                             |
-| --------------- | -------------------------------- |
-| `hooks`         | 通用 React Hooks 集合            |
-| `popover`       | Popover 浮层组件                 |
-| `calendar-base` | 无样式日历网格与日期工具         |
-| `data-table`    | 数据表格组件                     |
-| `date-picker`   | 弹出式日期选择器（Popover 组合） |
+| 包名            | 描述                              |
+| --------------- | --------------------------------- |
+| `hooks`         | 通用 React Hooks 集合             |
+| `popover`       | Popover 浮层组件                  |
+| `calendar-base` | 无样式日历网格与日期工具          |
+| `data-table`    | 数据表格组件                      |
+| `date-picker`   | 弹出式日期选择器（Popover 组合）  |
+| `text-field`    | TextField（MUI props，SCSS 样式） |
 
 ## Apps
 
